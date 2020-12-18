@@ -27,3 +27,5 @@ jobs:
       - uses: helaili/jekyll-action@master
         env:
           JEKYLL_PAT: ${{ secrets.JEKYLL_PAT }}
+        with:
+          target_branch: 'gh-pages'
