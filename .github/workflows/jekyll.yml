@@ -5,8 +5,8 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-
-  # Allows you to run this workflow manually from the Actions tab
+  schedule:
+    - cron:  '0 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -24,8 +24,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gems-
 
-      - uses: helaili/jekyll-action@master
-        env:
-          JEKYLL_PAT: ${{ secrets.JEKYLL_PAT }}
+      - uses: ruby/setup-ruby@v1
         with:
-          target_branch: 'gh-pages'
+          ruby-version: 2.7
+
+      - run: bundle install
+
+      - run: bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
