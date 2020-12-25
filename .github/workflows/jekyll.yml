@@ -32,7 +32,6 @@ jobs:
       - run: bundle config path vendor/bundle
 
       - run: bundle install --jobs 4 --retry 3
-        if: steps.cache.outputs.cache-hit != 'true'
 
       - run: bundle exec jekyll build
         env:
