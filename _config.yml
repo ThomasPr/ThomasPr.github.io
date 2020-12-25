@@ -19,20 +19,21 @@
 # in the templates via {{ site.myvariable }}.
 
 title: Thomas' Blog
-email: thomas@preissler.me
 description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  My personal thoughts about the technology I use and love.
+  It's about Java, Ruby on Rails, Frontends and project oddities.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: TheThomasPr
-github_username:  ThomasPr
+
+google_site_verification: VhaciMaca92rdlXRrqBBFXCR1hxERcyhW4Kqq7XafWM
+
 
 # Build settings
-theme: minima
+theme: minimal-mistakes-jekyll
 plugins:
   - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-include-cache
 
 # Exclude from processing.
 # The following items will not be processed, by default.
@@ -53,3 +54,35 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+include:
+  - "_pages"
+
+defaults:
+  # _posts
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      classes: wide
+      author_profile: true
+
+author:
+  name     : "Thomas Preißler"
+  avatar   : "/assets/images/thomas.jpg"
+  bio      : "software developer,<br />addicted to KISS"
+  location : "Freiburg, Germany"
+  links:
+    - label: "Email"
+      icon: "fas fa-fw fa-envelope"
+      url: "mailto:thomas@preissler.me"
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter"
+      url: "https://twitter.com/TheThomasPr"
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/ThomasPr"
+    - label: "Xing"
+      icon: "fab fa-fw fa-xing"
+      url: "https://www.xing.com/profile/Thomas_Preissler"

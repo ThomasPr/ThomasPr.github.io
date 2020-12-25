@@ -1,8 +1,8 @@
 ---
-layout: post
 title:  "How to setup a blog like this - Part 1: The Decision"
 date:   2020-12-20 22:43:50 +0100
 categories: blog
+excerpt: "It was a challenging task to decide which software I want to use for this blog."
 ---
 
 I'm a person who really thinks twice about the future development of his decisions, especially when it comes to a system that I probably use for years. It took me ages to set up a blog like this, but in the end it was just a matter of minutes. In this very first blog post I want to walk through the rationale that led me to the current setup.
