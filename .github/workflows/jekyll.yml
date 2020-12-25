@@ -23,15 +23,16 @@ jobs:
 
       # Use GitHub Actions' cache to shorten build times and decrease load on servers.
       - uses: actions/cache@v2
+        id: cache
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
+          restore-keys: ${{ runner.os }}-gems-
 
-      - run: |
-          bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
+      - run: bundle config path vendor/bundle
+
+      - run: bundle install --jobs 4 --retry 3
+        if: steps.cache.outputs.cache-hit != 'true'
 
       - run: bundle exec jekyll build
         env:
