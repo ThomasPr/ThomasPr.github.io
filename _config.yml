@@ -68,6 +68,8 @@ defaults:
       classes: wide
       author_profile: true
 
+og_image: /assets/images/og-image.jpg
+
 author:
   name     : "Thomas Preißler"
   avatar   : "/assets/images/thomas.jpg"
