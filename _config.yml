@@ -68,7 +68,17 @@ defaults:
       classes: wide
       author_profile: true
 
-og_image: /assets/images/og-image.jpg
+og_image: /assets/images/thomas.jpg
+
+
+social:
+  type: Person
+  name: Thomas Preißler
+  links:
+    - "https://twitter.com/TheThomasPr"
+    - "https://github.com/ThomasPr"
+    - "https://www.xing.com/profile/Thomas_Preissler"
+
 
 author:
   name     : "Thomas Preißler"
