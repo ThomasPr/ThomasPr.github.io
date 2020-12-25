@@ -1,4 +1,4 @@
-name: Build and deploy Jekyll site to GitHub Pages
+name: Deploy Jekyll
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ master ]
   schedule:
-    - cron:  '0 * * * *'
+    - cron: '0 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -16,6 +16,11 @@ jobs:
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+
+      - uses: actions/checkout@v2
+          with:
+            ref: 'gh-pages'
+            path: 'gh-pages'
 
       - uses: actions/setup-ruby@v1
         with:
@@ -32,6 +37,15 @@ jobs:
 
       - run: bundle install --jobs 4 --retry 3
 
-      - run: bundle exec jekyll build
-        env:
-          JEKYLL_ENV: production
+      - run: JEKYLL_ENV=production bundle exec jekyll build --verbose --destination gh-pages
+
+      - run: |
+          cd gh-pages && \
+          git config user.name "$GITHUB_ACTOR" && \
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com" && \
+          git add . && \
+          git commit -m "jekyll build from Action ${GITHUB_SHA}" && \
+          git push
+
+
+
