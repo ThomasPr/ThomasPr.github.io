@@ -77,6 +77,7 @@ social:
   links:
     - "https://twitter.com/TheThomasPr"
     - "https://github.com/ThomasPr"
+    - "https://stackoverflow.com/users/915955/thomas-prei%c3%9fler"
     - "https://www.xing.com/profile/Thomas_Preissler"
 
 
@@ -95,6 +96,9 @@ author:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/ThomasPr"
+    - label: "Stack Overflow"
+      icon: "fab fa-fw fa-stack-overflow"
+      url: "https://stackoverflow.com/users/915955/thomas-prei%c3%9fler"
     - label: "Xing"
       icon: "fab fa-fw fa-xing"
       url: "https://www.xing.com/profile/Thomas_Preissler"
