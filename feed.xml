@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://thomas.preissler.me/feed.xml" rel="self" type="application/atom+xml" /><link href="https://thomas.preissler.me/" rel="alternate" type="text/html" /><updated>2020-12-25T16:10:47+00:00</updated><id>https://thomas.preissler.me/feed.xml</id><title type="html">Thomas’ Blog</title><subtitle>My personal thoughts about the technology I use and love. It's about Java, Ruby on Rails, Frontends and project oddities.</subtitle><author><name>Thomas Preißler</name></author><entry><title type="html">How to setup a blog like this - Part 1: The Decision</title><link href="https://thomas.preissler.me/blog/2020/12/20/how-to-setup-a-blog-like-this-part-1-the-decision.html" rel="alternate" type="text/html" title="How to setup a blog like this - Part 1: The Decision" /><published>2020-12-20T21:43:50+00:00</published><updated>2020-12-20T21:43:50+00:00</updated><id>https://thomas.preissler.me/blog/2020/12/20/how-to-setup-a-blog-like-this-part-1-the-decision</id><content type="html" xml:base="https://thomas.preissler.me/blog/2020/12/20/how-to-setup-a-blog-like-this-part-1-the-decision.html">&lt;p&gt;I’m a person who really thinks twice about the future development of his decisions, especially when it comes to a system that I probably use for years. It took me ages to set up a blog like this, but in the end it was just a matter of minutes. In this very first blog post I want to walk through the rationale that led me to the current setup.&lt;/p&gt;
+
+&lt;h2 id=&quot;my-requirements&quot;&gt;My Requirements&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Having the content under version control (git)&lt;/li&gt;
+  &lt;li&gt;No vendor lock-in&lt;/li&gt;
+  &lt;li&gt;No burden for recurring maintence like security updates&lt;/li&gt;
+  &lt;li&gt;Use my own domain&lt;/li&gt;
+  &lt;li&gt;Fully customizable layout and content to fit my needs&lt;/li&gt;
+  &lt;li&gt;No WYSIWYG-editor, the HTML code looks always a bit creepy&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;the-alternatives&quot;&gt;The Alternatives&lt;/h2&gt;
+
+&lt;p&gt;There are many services and software out there to get almost the same result. Basically they can be grouped into four categories:&lt;/p&gt;
+
+&lt;h3 id=&quot;software-as-a-service&quot;&gt;Software as a Service&lt;/h3&gt;
+
+&lt;p&gt;Providers who offer a fully-featured system hosted and managed by them. You only need to sign up for their service and can start writing your first post.&lt;/p&gt;
+
+&lt;p&gt;The most popular blogging provider is workpress.com who provides a hosting instance of WordPress. Please be aware about the difference of the provider WordPress.com and the software WordPress. Other well-known providers are wix.com or jimdo.com, but there are many more out there.&lt;/p&gt;
+
+&lt;h3 id=&quot;software-installed-on-your-own-server&quot;&gt;Software installed on your own server&lt;/h3&gt;
+
+&lt;p&gt;Software to be installed and managed by your own on your own server. Mostly, you need a php-powered webspace with a database and upload the software to this webspace. After entering some configuration options you can start blogging. The setup is quite easy and many webspace providers offer a one-click installation where they automated the hassle of installing and configuring the software. However, it’s very uncommon to install software updates and offer migrations in a one-click fashion. WordPress is the the most popular software, but only one out of a huge list.&lt;/p&gt;
+
+&lt;h3 id=&quot;static-site-generators&quot;&gt;Static site generators&lt;/h3&gt;
+
+&lt;p&gt;Since I do not plan to offer any dynamic content like comments, contact forms or user login, the blog itself can be run by static pages only. A static site generator where I create the content locally, generate the web page and upload that to web server is a valid option for my requirements. The generated pages can be uploaded to AWS S3 or even simpler just to GitHub Pages. Static site generators are not that common, but some of the known ones are Jekyll, Hugo or Middleman.&lt;/p&gt;
+
+&lt;h3 id=&quot;develop-the-software-by-my-own&quot;&gt;Develop the software by my own&lt;/h3&gt;
+
+&lt;p&gt;This feels like re-inventing the wheel once again, but this will be the most flexible and most customizable solution. Since I’m a professional software developer, I have quite some experience to develop my own software.&lt;/p&gt;
+
+&lt;h2 id=&quot;my-decision&quot;&gt;My Decision&lt;/h2&gt;
+
+&lt;p&gt;It took ages from the idea to blog by myself until I finally was able to write this blog post you’re reading right now. Let me show you my opinion about the options:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Software as a Service: This seems to be the worst option, I’m hardly able to move my content, have to use a WYSIWYG editor and be unable to fully customize my blog. Therefore, I won’t go for that.&lt;/li&gt;
+  &lt;li&gt;Software installed on my own server: Thats a much better option, at least I’m able to access the content in the database. But even if I can modify the software and therefore my blog therotically, I don’t have much experience with PHP which is used by many blog engines such as WordPress.&lt;/li&gt;
+  &lt;li&gt;Static site generators: Seems to be a good option, I don’t have to deal with security updates, they’re usually simple enough for easy layout changes and depending on the hosting I’m able to use my own domain.&lt;/li&gt;
+  &lt;li&gt;Developing my own software: A very flexible but very time-consuming option. Since I don’t want to focus on blogging itself, not on the blogging software, this option is not my preference. Additionally, I still have to deal with security updates, even worse I have to find and fix them by my own.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In the end, I just decided to go for a static site generator: I really like the simplicity and the broad hosting options. Since I already spend so many time to for that decision, I just took the one that I alredy knew from the past: &lt;strong&gt;Jekyll&lt;/strong&gt;. For the hosting part I’ll go for GitHub Pages who offers an incredible easy way to host static pages and even more actually generate the static pages based of the Jekyll content.&lt;/p&gt;
+
+&lt;p&gt;Check out my public repository on GitHub to see final result:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;The &lt;a href=&quot;https://github.com/ThomasPr/ThomasPr.github.io/tree/master&quot;&gt;master&lt;/a&gt; branch contains the Jekyll content&lt;/li&gt;
+  &lt;li&gt;The &lt;a href=&quot;https://github.com/ThomasPr/ThomasPr.github.io/tree/gh-pages&quot;&gt;gh-pages&lt;/a&gt; branch contains the generated static pages which are visible in the blog&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Thomas Preißler</name></author><category term="blog" /><summary type="html">It was a challenging task to decide which software I want to use for this blog.</summary></entry></feed>
