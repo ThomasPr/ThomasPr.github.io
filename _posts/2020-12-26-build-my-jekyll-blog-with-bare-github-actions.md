@@ -141,4 +141,4 @@ To enable GitHub Pages for your repository open the Settings tab and scroll down
 The only required setting is to change the Source to the `gh-pages` branch. But I strongly recommend to also enable the "Enforce HTTPS" setting.
 
 
-Thats it. The blog is up and running. Every time I push a changes to my blog, the GitHub Action should be triggered and the updated static HTML page should be updated and published.
+Thats it. The blog is up and running. Every time I push a change to my blog, the GitHub Action is triggered and the updated static HTML page is published.
