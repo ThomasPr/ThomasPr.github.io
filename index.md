@@ -4,7 +4,9 @@
 
 layout: home
 classes: wide
+header:
+  overlay_image: /assets/images/teaser.jpeg
+  show_overlay_excerpt: true
+excerpt: "**My personal thoughts on technology and oddities.**"
 author_profile: true
 ---
-
-My personal thoughts on technology and oddities.
