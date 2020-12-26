@@ -85,8 +85,8 @@ Both branches, `master` and `gh-pages`, will be checked out so that the `gh-page
 
 - name: bundle install
   run: |
-    bundle config path vendor/bundle
-    bundle install --jobs 4 --retry 3
+    bundle install --path=vendor/bundle --jobs 4 --retry 3
+    bundle clean
 ```
 {% endraw %}
 

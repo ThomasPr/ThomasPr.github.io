@@ -36,8 +36,8 @@ jobs:
 
       - name: bundle install
         run: |
-          bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
+          bundle install --path=vendor/bundle --jobs 4 --retry 3
+          bundle clean
 
       - name: jekyll build
         run: JEKYLL_ENV=production bundle exec jekyll build --destination gh-pages
