@@ -6,3 +6,5 @@ layout: home
 classes: wide
 author_profile: true
 ---
+
+My personal thoughts on technology and oddities.
