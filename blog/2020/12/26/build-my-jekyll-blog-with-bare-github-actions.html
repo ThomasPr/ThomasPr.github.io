@@ -370,8 +370,8 @@
 
 <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">bundle install</span>
   <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
-    <span class="s">bundle config path vendor/bundle</span>
-    <span class="s">bundle install --jobs 4 --retry 3</span>
+    <span class="s">bundle install --path=vendor/bundle --jobs 4 --retry 3</span>
+    <span class="s">bundle clean</span>
 </code></pre></div></div>
 
 <p>The three steps should be quite self-explaining. <code class="language-plaintext highlighter-rouge">setup ruby</code> takes care that ruby will be available for future steps and <code class="language-plaintext highlighter-rouge">bundle install</code> will install all gems as defined in the <code class="language-plaintext highlighter-rouge">Gemfile.lock</code>.</p>
