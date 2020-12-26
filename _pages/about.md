@@ -7,7 +7,7 @@ author_profile: true
 excerpt: I have 10+ years of experience as a lead developer in various technologies and companies. I studied abroad in the UK for almost a year and co-founded a startup.
 ---
 
-I have 10+ years of experience as a lead developer in various technologies and companies. I studied abroad in the UK for almost a year and co-founded a startup.
+I have 10+ years of experience as a Software Engineer in various technologies and companies. I studied abroad in the UK for almost a year and co-founded a startup.
 
 My passion is to follow the **KISS** principle through the journey of a software project. To **k**eep **i**t **s**mall and **s**imple is by far the most valuable and most challenging task. However, it's so much worth it to get a maintainable project that's fun to work on.
 
