@@ -10,37 +10,43 @@ on:
 jobs:
   jekyll:
     runs-on: ubuntu-latest
+
     steps:
 
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: checkout master
+        uses: actions/checkout@v2
 
-      - uses: actions/checkout@v2
+      - name: checkout gh-pages
+        uses: actions/checkout@v2
         with:
           ref: 'gh-pages'
           path: 'gh-pages'
 
-      - uses: actions/setup-ruby@v1
+      - name: setup ruby
+        uses: actions/setup-ruby@v1
         with:
           ruby-version: 2.7
 
-      # Use GitHub Actions' cache to shorten build times and decrease load on servers.
-      - uses: actions/cache@v2
+      - name: cache gems
+        uses: actions/cache@v2
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: ${{ runner.os }}-gems-
 
-      - run: |
+      - name: bundle install
+        run: |
           bundle config path vendor/bundle
           bundle install --jobs 4 --retry 3
 
-      - run: JEKYLL_ENV=production bundle exec jekyll build --destination gh-pages
+      - name: jekyll build
+        run: JEKYLL_ENV=production bundle exec jekyll build --destination gh-pages
 
-      - run: |
-          cd gh-pages && \
+      - name: push gh-pages
+        run: |
           git config user.name "${GITHUB_ACTOR}" && \
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com" && \
+          cd gh-pages && \
           git add . && \
           git commit -m "jekyll build from Action ${GITHUB_SHA}" && \
           git push
