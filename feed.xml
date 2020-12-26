@@ -1,4 +1,125 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://thomas.preissler.me/feed.xml" rel="self" type="application/atom+xml" /><link href="https://thomas.preissler.me/" rel="alternate" type="text/html" /><updated>2020-12-26T09:25:49+00:00</updated><id>https://thomas.preissler.me/feed.xml</id><title type="html">Thomas’ Blog</title><subtitle>My personal thoughts about the technology I use and love. It's about Java, Ruby on Rails, Frontends and project oddities.</subtitle><author><name>Thomas Preißler</name></author><entry><title type="html">How to setup a blog like this - Part 1: The Decision</title><link href="https://thomas.preissler.me/blog/2020/12/20/how-to-setup-a-blog-like-this-part-1-the-decision.html" rel="alternate" type="text/html" title="How to setup a blog like this - Part 1: The Decision" /><published>2020-12-20T21:43:50+00:00</published><updated>2020-12-20T21:43:50+00:00</updated><id>https://thomas.preissler.me/blog/2020/12/20/how-to-setup-a-blog-like-this-part-1-the-decision</id><content type="html" xml:base="https://thomas.preissler.me/blog/2020/12/20/how-to-setup-a-blog-like-this-part-1-the-decision.html">&lt;p&gt;I’m a person who really thinks twice about the future development of his decisions, especially when it comes to a system that I probably use for years. It took me ages to set up a blog like this, but in the end it was just a matter of minutes. In this very first blog post I want to walk through the rationale that led me to the current setup.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://thomas.preissler.me/feed.xml" rel="self" type="application/atom+xml" /><link href="https://thomas.preissler.me/" rel="alternate" type="text/html" /><updated>2020-12-26T21:04:17+00:00</updated><id>https://thomas.preissler.me/feed.xml</id><title type="html">Thomas’ Blog</title><subtitle>My personal thoughts on technology and oddities.</subtitle><author><name>Thomas Preißler</name></author><entry><title type="html">Build my Jekyll blog with bare GitHub Actions</title><link href="https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions.html" rel="alternate" type="text/html" title="Build my Jekyll blog with bare GitHub Actions" /><published>2020-12-26T09:55:03+00:00</published><updated>2020-12-26T09:55:03+00:00</updated><id>https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions</id><content type="html" xml:base="https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions.html">&lt;p&gt;I use &lt;a href=&quot;https://jekyllrb.com/&quot;&gt;Jekyll&lt;/a&gt; to create my blog. It allows me to focus on writing the content with markdown and afterwards to generate a static HTML page that can be published easily.&lt;/p&gt;
+
+&lt;p&gt;Next to Jekyll there are three additional components, all provided by GitHub:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;source control for the raw blog content&lt;/li&gt;
+  &lt;li&gt;generating the static page with GitHub Actions&lt;/li&gt;
+  &lt;li&gt;hosting the generated static page with GitHub Pages&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Of course, there are many other options if you don’t prefer GitHub. You could also distribute these components to different providers. However, I like the simplicity and completness of GitHub. Additionally, GitHub is free of charge for my purposes.&lt;/p&gt;
+
+&lt;p&gt;You can check out the final results in &lt;a href=&quot;https://github.com/ThomasPr/ThomasPr.github.io&quot;&gt;my public repository&lt;/a&gt;. No worries, we’ll walk through the necessary steps.&lt;/p&gt;
+
+&lt;h2 id=&quot;1-create-jekyll-page&quot;&gt;1. Create Jekyll page&lt;/h2&gt;
+
+&lt;p&gt;This is not a blog post about Jekyll, they provide a good documentation. Just have a look at the &lt;a href=&quot;https://jekyllrb.com/docs/&quot;&gt;Jekyll Quickstart&lt;/a&gt; to get started with Jekyll.&lt;/p&gt;
+
+&lt;h2 id=&quot;2-push-jekyll-page&quot;&gt;2. Push Jekyll page&lt;/h2&gt;
+
+&lt;p&gt;Push the newly created Jekyll page to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;master&lt;/code&gt; branch of a newly created GitHub repository.&lt;/p&gt;
+
+&lt;p&gt;In this example we’ll use the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;master&lt;/code&gt; branch for the raw Jekyll page, it’s the branch where I commit and push all the changes I make. In contrast to that, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; branch will contain the automatically generated static HTML page where only the GitHub Action will push into.&lt;/p&gt;
+
+&lt;h2 id=&quot;3-add-the-github-action&quot;&gt;3. Add the GitHub Action&lt;/h2&gt;
+
+&lt;p&gt;A GitHub Action is a list of commands that will be executed after an event occurs, such as a new commit. It needs to be defined as a yaml file inside the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.github/workflows&lt;/code&gt; folder of the repository. In our case, the GitHub Action is the important piece that is responsible for generating the static page out of the Jekyll source.&lt;/p&gt;
+
+&lt;p&gt;Additionally, I don’t want to rely on any third-party marketplace Actions. They might be orphaned after some time or contain unwanted side-effects. So, I’ll just use the Actions and commands provided by GitHub itself.&lt;/p&gt;
+
+&lt;p&gt;In contrast to automate the workflow by utilizing a GitHub Action, you could manually run &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;jekyll build&lt;/code&gt; on your local machine and upload the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_site&lt;/code&gt; directory to a server every time you make changes to your blog. Basically, the GitHub Action will do the same, but it will take the burden for this boring recurring task.&lt;/p&gt;
+
+&lt;p&gt;You can see my complete GitHub Action &lt;a href=&quot;https://github.com/ThomasPr/ThomasPr.github.io/blob/master/.github/workflows/jekyll.yml&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;To be clear, the following steps are necessary:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Checkout the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;master&lt;/code&gt; branch&lt;/li&gt;
+  &lt;li&gt;Install Ruby and the dependencies from the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Gemfile&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Run &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;jekyll build&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Push the generated HTML files to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; branch&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Let me walk you through the important steps:&lt;/p&gt;
+
+&lt;h3 id=&quot;checkout&quot;&gt;Checkout&lt;/h3&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;checkout master&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;uses&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;actions/checkout@v2&lt;/span&gt;
+
+&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;checkout gh-pages&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;uses&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;actions/checkout@v2&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;with&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;ref&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;gh-pages'&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;gh-pages'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Both branches, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;master&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt;, will be checked out so that the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; branch resides in the subfolder &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt;. Later on, Jekyll will write its output into this &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; folder.&lt;/p&gt;
+
+&lt;h3 id=&quot;install-ruby-and-dependencies&quot;&gt;Install Ruby and dependencies&lt;/h3&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;setup ruby&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;uses&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;actions/setup-ruby@v1&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;with&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;ruby-version&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2.7&lt;/span&gt;
+
+&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache gems&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;uses&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;actions/cache@v2&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;with&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vendor/bundle&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;restore-keys&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;${{ runner.os }}-gems-&lt;/span&gt;
+
+&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bundle install&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;run&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;bundle config path vendor/bundle&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;bundle install --jobs 4 --retry 3&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The three steps should be quite self-explaining. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;setup ruby&lt;/code&gt; takes care that ruby will be available for future steps and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bundle install&lt;/code&gt; will install all gems as defined in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Gemfile.lock&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The caching might not be obvious: It takes about three minutes to install all dependencies from scratch. But what if we could save this time by re-using the installed gems from a previous run? That’s exaclty what the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cache gems&lt;/code&gt; step does. After each run of the GitHub Action it takes the folder &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vendor/bundle&lt;/code&gt;, puts that into a zip-archive and restores it before the next run. We just need to make sure that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bundle install&lt;/code&gt; also uses the folder &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vendor/bundle&lt;/code&gt; for storing the gems. This will bring the build time down from over three minutes to less than thirty seconds.&lt;/p&gt;
+
+&lt;h3 id=&quot;build-the-static-page&quot;&gt;Build the static page&lt;/h3&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;jekyll build&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;run&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;JEKYLL_ENV=production bundle exec jekyll build --destination gh-pages&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Thats the main step in our GitHub Action, it actually takes Jekyll to generate the static HTML page. Please note that we specify the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; folder as the destination for the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;jekyll build&lt;/code&gt; step. Remember, that we checked out the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; branch from our repository into this &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; folder.&lt;/p&gt;
+
+&lt;h3 id=&quot;push-the-generated-static-page&quot;&gt;Push the generated static page&lt;/h3&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;push gh-pages&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;run&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;cd gh-pages &amp;amp;&amp;amp; \&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;git config user.name &quot;${GITHUB_ACTOR}&quot; &amp;amp;&amp;amp; \&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;git config user.email &quot;${GITHUB_ACTOR}@users.noreply.github.com&quot; &amp;amp;&amp;amp; \&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;git add . &amp;amp;&amp;amp; \&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;git commit -m &quot;jekyll build from Action ${GITHUB_SHA}&quot; &amp;amp;&amp;amp; \&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;git push&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We’re switching into the folder &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; which has been created based on the branch &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; and which contains the latest changes to our static page from the last &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;jekyll build&lt;/code&gt;. This step just commits and pushes any changes in this folder to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; branch to get the static page that we can publish on the web. Actually, this step creates the HTML pages shown to a blog visitor.&lt;/p&gt;
+
+&lt;h3 id=&quot;see-the-github-action-in-action&quot;&gt;See the GitHub Action in action&lt;/h3&gt;
+
+&lt;p&gt;Once you committed and pushed this workflow-file into the master branch the GitHub Action should be executed. To verify that, click on the Action tab of your Repository and see your newly created Action. The first run can take a couple of minutes.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2020-12-26/github-action.png&quot; alt=&quot;GitHub Action&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;4-enable-github-pages&quot;&gt;4. Enable GitHub Pages&lt;/h2&gt;
+
+&lt;p&gt;The last task is to enable the hosting of the generated static page content. Just make sure that the GitHub Action has been completed successfully before you continue.&lt;/p&gt;
+
+&lt;p&gt;To enable GitHub Pages for your repository open the Settings tab and scroll down a little bit. You should see a section named “GitHub Pages”.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2020-12-26/github-pages.png&quot; alt=&quot;GitHub Pages&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The only required setting is to change the Source to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gh-pages&lt;/code&gt; branch. But I strongly recommend to also enable the “Enforce HTTPS” setting.&lt;/p&gt;
+
+&lt;p&gt;Thats it. The blog is up and running. Every time I push a changes to my blog, the GitHub Action should be triggered and the updated static HTML page should be updated and published.&lt;/p&gt;</content><author><name>Thomas Preißler</name></author><category term="blog" /><summary type="html">Use GitHub Actions without third-party marketplace Actions to build my Jekyll blog. Publish the generated content on GitHub Pages.</summary></entry><entry><title type="html">Make decisions about a blogging system</title><link href="https://thomas.preissler.me/blog/2020/12/20/make-decisions-about-a-blogging-system.html" rel="alternate" type="text/html" title="Make decisions about a blogging system" /><published>2020-12-20T21:43:50+00:00</published><updated>2020-12-20T21:43:50+00:00</updated><id>https://thomas.preissler.me/blog/2020/12/20/make-decisions-about-a-blogging-system</id><content type="html" xml:base="https://thomas.preissler.me/blog/2020/12/20/make-decisions-about-a-blogging-system.html">&lt;p&gt;I’m a person who really thinks twice about the future development of his decisions, especially when it comes to a system that I probably use for years. It took me ages to set up a blog like this, but in the end it was just a matter of minutes. In this very first blog post I want to walk through the rationale that led me to the current setup.&lt;/p&gt;
 
 &lt;h2 id=&quot;my-requirements&quot;&gt;My Requirements&lt;/h2&gt;
 

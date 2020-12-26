@@ -1,0 +1,471 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.21.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Build my Jekyll blog with bare GitHub Actions - Thomas’ Blog</title>
+<meta name="description" content="Use GitHub Actions without third-party marketplace Actions to build my Jekyll blog. Publish the generated content on GitHub Pages.">
+
+
+  <meta name="author" content="Thomas Preißler">
+  
+  <meta property="article:author" content="Thomas Preißler">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Thomas' Blog">
+<meta property="og:title" content="Build my Jekyll blog with bare GitHub Actions">
+<meta property="og:url" content="https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions.html">
+
+
+  <meta property="og:description" content="Use GitHub Actions without third-party marketplace Actions to build my Jekyll blog. Publish the generated content on GitHub Pages.">
+
+
+
+
+
+
+
+  <meta property="article:published_time" content="2020-12-26T09:55:03+00:00">
+
+
+
+
+
+
+<link rel="canonical" href="https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Thomas Preißler",
+      "url": "https://thomas.preissler.me/",
+      "sameAs": ["https://twitter.com/TheThomasPr","https://github.com/ThomasPr","https://stackoverflow.com/users/915955/thomas-prei%c3%9fler","https://www.xing.com/profile/Thomas_Preissler"]
+    
+  }
+</script>
+
+
+  <meta name="google-site-verification" content="VhaciMaca92rdlXRrqBBFXCR1hxERcyhW4Kqq7XafWM" />
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Thomas' Blog Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <link rel="icon" href="/assets/images/thomas.jpg" type="image/jpeg" />
+
+  </head>
+
+  <body class="layout--single wide">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          Thomas' Blog
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/">Blog</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about">About</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/thomas.jpg" alt="Thomas Preißler" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Thomas Preißler</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>software developer,<br />addicted to KISS</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Freiburg, Germany</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="mailto:thomas@preissler.me" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-envelope" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/TheThomasPr" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/ThomasPr" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://stackoverflow.com/users/915955/thomas-prei%c3%9fler" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i><span class="label">Stack Overflow</span></a></li>
+          
+        
+          
+            <li><a href="https://www.xing.com/profile/Thomas_Preissler" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-xing" aria-hidden="true"></i><span class="label">Xing</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Build my Jekyll blog with bare GitHub Actions">
+    <meta itemprop="description" content="Use GitHub Actions without third-party marketplace Actions to build my Jekyll blog. Publish the generated content on GitHub Pages.">
+    <meta itemprop="datePublished" content="2020-12-26T09:55:03+00:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Build my Jekyll blog with bare GitHub Actions
+</h1>
+          
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>I use <a href="https://jekyllrb.com/">Jekyll</a> to create my blog. It allows me to focus on writing the content with markdown and afterwards to generate a static HTML page that can be published easily.</p>
+
+<p>Next to Jekyll there are three additional components, all provided by GitHub:</p>
+
+<ul>
+  <li>source control for the raw blog content</li>
+  <li>generating the static page with GitHub Actions</li>
+  <li>hosting the generated static page with GitHub Pages</li>
+</ul>
+
+<p>Of course, there are many other options if you don’t prefer GitHub. You could also distribute these components to different providers. However, I like the simplicity and completness of GitHub. Additionally, GitHub is free of charge for my purposes.</p>
+
+<p>You can check out the final results in <a href="https://github.com/ThomasPr/ThomasPr.github.io">my public repository</a>. No worries, we’ll walk through the necessary steps.</p>
+
+<h2 id="1-create-jekyll-page">1. Create Jekyll page</h2>
+
+<p>This is not a blog post about Jekyll, they provide a good documentation. Just have a look at the <a href="https://jekyllrb.com/docs/">Jekyll Quickstart</a> to get started with Jekyll.</p>
+
+<h2 id="2-push-jekyll-page">2. Push Jekyll page</h2>
+
+<p>Push the newly created Jekyll page to the <code class="language-plaintext highlighter-rouge">master</code> branch of a newly created GitHub repository.</p>
+
+<p>In this example we’ll use the <code class="language-plaintext highlighter-rouge">master</code> branch for the raw Jekyll page, it’s the branch where I commit and push all the changes I make. In contrast to that, the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch will contain the automatically generated static HTML page where only the GitHub Action will push into.</p>
+
+<h2 id="3-add-the-github-action">3. Add the GitHub Action</h2>
+
+<p>A GitHub Action is a list of commands that will be executed after an event occurs, such as a new commit. It needs to be defined as a yaml file inside the <code class="language-plaintext highlighter-rouge">.github/workflows</code> folder of the repository. In our case, the GitHub Action is the important piece that is responsible for generating the static page out of the Jekyll source.</p>
+
+<p>Additionally, I don’t want to rely on any third-party marketplace Actions. They might be orphaned after some time or contain unwanted side-effects. So, I’ll just use the Actions and commands provided by GitHub itself.</p>
+
+<p>In contrast to automate the workflow by utilizing a GitHub Action, you could manually run <code class="language-plaintext highlighter-rouge">jekyll build</code> on your local machine and upload the <code class="language-plaintext highlighter-rouge">_site</code> directory to a server every time you make changes to your blog. Basically, the GitHub Action will do the same, but it will take the burden for this boring recurring task.</p>
+
+<p>You can see my complete GitHub Action <a href="https://github.com/ThomasPr/ThomasPr.github.io/blob/master/.github/workflows/jekyll.yml">here</a>.</p>
+
+<p>To be clear, the following steps are necessary:</p>
+
+<ol>
+  <li>Checkout the <code class="language-plaintext highlighter-rouge">master</code> branch</li>
+  <li>Install Ruby and the dependencies from the <code class="language-plaintext highlighter-rouge">Gemfile</code></li>
+  <li>Run <code class="language-plaintext highlighter-rouge">jekyll build</code></li>
+  <li>Push the generated HTML files to the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch</li>
+</ol>
+
+<p>Let me walk you through the important steps:</p>
+
+<h3 id="checkout">Checkout</h3>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">checkout master</span>
+  <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v2</span>
+
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">checkout gh-pages</span>
+  <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v2</span>
+  <span class="na">with</span><span class="pi">:</span>
+    <span class="na">ref</span><span class="pi">:</span> <span class="s1">'</span><span class="s">gh-pages'</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s1">'</span><span class="s">gh-pages'</span>
+</code></pre></div></div>
+
+<p>Both branches, <code class="language-plaintext highlighter-rouge">master</code> and <code class="language-plaintext highlighter-rouge">gh-pages</code>, will be checked out so that the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch resides in the subfolder <code class="language-plaintext highlighter-rouge">gh-pages</code>. Later on, Jekyll will write its output into this <code class="language-plaintext highlighter-rouge">gh-pages</code> folder.</p>
+
+<h3 id="install-ruby-and-dependencies">Install Ruby and dependencies</h3>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">setup ruby</span>
+  <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/setup-ruby@v1</span>
+  <span class="na">with</span><span class="pi">:</span>
+    <span class="na">ruby-version</span><span class="pi">:</span> <span class="m">2.7</span>
+
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cache gems</span>
+  <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/cache@v2</span>
+  <span class="na">with</span><span class="pi">:</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s">vendor/bundle</span>
+    <span class="na">key</span><span class="pi">:</span> <span class="s">${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}</span>
+    <span class="na">restore-keys</span><span class="pi">:</span> <span class="s">${{ runner.os }}-gems-</span>
+
+<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">bundle install</span>
+  <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">bundle config path vendor/bundle</span>
+    <span class="s">bundle install --jobs 4 --retry 3</span>
+</code></pre></div></div>
+
+<p>The three steps should be quite self-explaining. <code class="language-plaintext highlighter-rouge">setup ruby</code> takes care that ruby will be available for future steps and <code class="language-plaintext highlighter-rouge">bundle install</code> will install all gems as defined in the <code class="language-plaintext highlighter-rouge">Gemfile.lock</code>.</p>
+
+<p>The caching might not be obvious: It takes about three minutes to install all dependencies from scratch. But what if we could save this time by re-using the installed gems from a previous run? That’s exaclty what the <code class="language-plaintext highlighter-rouge">cache gems</code> step does. After each run of the GitHub Action it takes the folder <code class="language-plaintext highlighter-rouge">vendor/bundle</code>, puts that into a zip-archive and restores it before the next run. We just need to make sure that <code class="language-plaintext highlighter-rouge">bundle install</code> also uses the folder <code class="language-plaintext highlighter-rouge">vendor/bundle</code> for storing the gems. This will bring the build time down from over three minutes to less than thirty seconds.</p>
+
+<h3 id="build-the-static-page">Build the static page</h3>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">jekyll build</span>
+  <span class="na">run</span><span class="pi">:</span> <span class="s">JEKYLL_ENV=production bundle exec jekyll build --destination gh-pages</span>
+</code></pre></div></div>
+
+<p>Thats the main step in our GitHub Action, it actually takes Jekyll to generate the static HTML page. Please note that we specify the <code class="language-plaintext highlighter-rouge">gh-pages</code> folder as the destination for the <code class="language-plaintext highlighter-rouge">jekyll build</code> step. Remember, that we checked out the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch from our repository into this <code class="language-plaintext highlighter-rouge">gh-pages</code> folder.</p>
+
+<h3 id="push-the-generated-static-page">Push the generated static page</h3>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">push gh-pages</span>
+  <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">cd gh-pages &amp;&amp; \</span>
+    <span class="s">git config user.name "${GITHUB_ACTOR}" &amp;&amp; \</span>
+    <span class="s">git config user.email "${GITHUB_ACTOR}@users.noreply.github.com" &amp;&amp; \</span>
+    <span class="s">git add . &amp;&amp; \</span>
+    <span class="s">git commit -m "jekyll build from Action ${GITHUB_SHA}" &amp;&amp; \</span>
+    <span class="s">git push</span>
+</code></pre></div></div>
+
+<p>We’re switching into the folder <code class="language-plaintext highlighter-rouge">gh-pages</code> which has been created based on the branch <code class="language-plaintext highlighter-rouge">gh-pages</code> and which contains the latest changes to our static page from the last <code class="language-plaintext highlighter-rouge">jekyll build</code>. This step just commits and pushes any changes in this folder to the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch to get the static page that we can publish on the web. Actually, this step creates the HTML pages shown to a blog visitor.</p>
+
+<h3 id="see-the-github-action-in-action">See the GitHub Action in action</h3>
+
+<p>Once you committed and pushed this workflow-file into the master branch the GitHub Action should be executed. To verify that, click on the Action tab of your Repository and see your newly created Action. The first run can take a couple of minutes.</p>
+
+<p><img src="/assets/images/2020-12-26/github-action.png" alt="GitHub Action" /></p>
+
+<h2 id="4-enable-github-pages">4. Enable GitHub Pages</h2>
+
+<p>The last task is to enable the hosting of the generated static page content. Just make sure that the GitHub Action has been completed successfully before you continue.</p>
+
+<p>To enable GitHub Pages for your repository open the Settings tab and scroll down a little bit. You should see a section named “GitHub Pages”.</p>
+
+<p><img src="/assets/images/2020-12-26/github-pages.png" alt="GitHub Pages" /></p>
+
+<p>The only required setting is to change the Source to the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch. But I strongly recommend to also enable the “Enforce HTTPS” setting.</p>
+
+<p>Thats it. The blog is up and running. Every time I push a changes to my blog, the GitHub Action should be triggered and the updated static HTML page should be updated and published.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2020-12-26T09:55:03+00:00">December 26, 2020</time></p>
+
+
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>
