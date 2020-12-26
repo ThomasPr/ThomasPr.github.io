@@ -76,6 +76,11 @@ social:
     - "https://stackoverflow.com/users/915955/thomas-prei%c3%9fler"
     - "https://www.xing.com/profile/Thomas_Preissler"
 
+footer:
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/ThomasPr/ThomasPr.github.io"
 
 author:
   name     : "Thomas Preißler"
