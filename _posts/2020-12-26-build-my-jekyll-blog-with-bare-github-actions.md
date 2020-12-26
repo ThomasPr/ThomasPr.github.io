@@ -2,8 +2,9 @@
 title:  "Build my Jekyll blog with bare GitHub Actions"
 date:   2020-12-26 10:55:03 +0100
 categories: blog
-og_image: /assets/images/2020-12-26/github-action.png
 excerpt: "Use GitHub Actions without third-party marketplace Actions to build my Jekyll blog. Publish the generated content on GitHub Pages."
+header:
+  og_image: /assets/images/2020-12-26/github-action.png
 ---
 
 I use [Jekyll](https://jekyllrb.com/) to create my blog. It allows me to focus on writing the content with markdown and afterwards to generate a static HTML page that can be published easily.
