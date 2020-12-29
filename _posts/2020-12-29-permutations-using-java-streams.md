@@ -2,7 +2,7 @@
 title:  "Build a Cartesian Product with Java Streams"
 date:   2020-12-29 21:40:00 +0100
 categories: blog
-excerpt: "Buildung a Cartesian Product or Permutation is challenging. I used Java Streams to implement a readable algorithm."
+excerpt: "Building a Cartesian Product or Permutation is challenging. I used Java Streams to implement a readable algorithm."
 header:
   og_image: /assets/images/2020-12-29/cartesian-product.png
 ---
