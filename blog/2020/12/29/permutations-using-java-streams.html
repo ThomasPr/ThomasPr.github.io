@@ -1,0 +1,443 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.21.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Build a Cartesian Product with Java Streams - Thomas’ Blog</title>
+<meta name="description" content="Buildung a Cartesian Product or Permutation is challenging. I used Java Streams to implement a readable algorithm.">
+
+
+  <meta name="author" content="Thomas Preißler">
+  
+  <meta property="article:author" content="Thomas Preißler">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Thomas' Blog">
+<meta property="og:title" content="Build a Cartesian Product with Java Streams">
+<meta property="og:url" content="https://thomas.preissler.me/blog/2020/12/29/permutations-using-java-streams.html">
+
+
+  <meta property="og:description" content="Buildung a Cartesian Product or Permutation is challenging. I used Java Streams to implement a readable algorithm.">
+
+
+
+  <meta property="og:image" content="https://thomas.preissler.me/assets/images/2020-12-29/cartesian-product.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2020-12-29T20:40:00+00:00">
+
+
+
+
+
+
+<link rel="canonical" href="https://thomas.preissler.me/blog/2020/12/29/permutations-using-java-streams.html">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Thomas Preißler",
+      "url": "https://thomas.preissler.me/",
+      "sameAs": ["https://twitter.com/TheThomasPr","https://github.com/ThomasPr","https://stackoverflow.com/users/915955/thomas-prei%c3%9fler","https://www.xing.com/profile/Thomas_Preissler"]
+    
+  }
+</script>
+
+
+  <meta name="google-site-verification" content="VhaciMaca92rdlXRrqBBFXCR1hxERcyhW4Kqq7XafWM" />
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+<link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Thomas' Blog Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+
+<!--[if IE]>
+  <style>
+    /* old IE unsupported flexbox fixes */
+    .greedy-nav .site-title {
+      padding-right: 3em;
+    }
+    .greedy-nav button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+    }
+  </style>
+<![endif]-->
+
+
+
+    <link rel="icon" href="/assets/images/thomas.jpg" type="image/jpeg" />
+
+  </head>
+
+  <body class="layout--single wide">
+    <nav class="skip-links">
+  <h2 class="screen-reader-text">Skip links</h2>
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          Thomas' Blog
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/">Blog</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about">About</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/thomas.jpg" alt="Thomas Preißler" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Thomas Preißler</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>software developer,<br />addicted to KISS</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Freiburg, Germany</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="mailto:thomas@preissler.me" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-envelope" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/TheThomasPr" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/ThomasPr" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://stackoverflow.com/users/915955/thomas-prei%c3%9fler" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i><span class="label">Stack Overflow</span></a></li>
+          
+        
+          
+            <li><a href="https://www.xing.com/profile/Thomas_Preissler" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-xing" aria-hidden="true"></i><span class="label">Xing</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Build a Cartesian Product with Java Streams">
+    <meta itemprop="description" content="Buildung a Cartesian Product or Permutation is challenging. I used Java Streams to implement a readable algorithm.">
+    <meta itemprop="datePublished" content="2020-12-29T20:40:00+00:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Build a Cartesian Product with Java Streams
+</h1>
+          
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>Recently, I ran over an old post by Baeldung: <a href="https://www.baeldung.com/java-array-permutations">Permutations of an Array in Java
+</a>. He presented very well solutions, as usual. I just want to provide another point of view: Readability. IMHO, readability is one of the most important aspects for code. Some time ago I had to solve a similiar issue and used Java Streams to create a Cartesian Product out of Lists.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">static</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">Collections</span><span class="o">.</span><span class="na">unmodifiableList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">java</span><span class="o">.</span><span class="na">util</span><span class="o">.</span><span class="na">stream</span><span class="o">.</span><span class="na">Collectors</span><span class="o">.</span><span class="na">toList</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Objects</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.function.BinaryOperator</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.stream.Stream</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">CartesianProductUtil</span> <span class="o">{</span>
+
+  <span class="kd">private</span> <span class="nf">CartesianProductUtil</span><span class="o">()</span> <span class="o">{</span> <span class="o">}</span>
+
+  <span class="cm">/**
+   * Compute the cartesian product for n lists.
+   * The algorithm employs that A x B x C = (A x B) x C
+   *
+   * @param listsToJoin [a, b], [x, y], [1, 2]
+   * @return [a, x, 1], [a, x, 2], [a, y, 1], [a, y, 2], [b, x, 1], [b, x, 2], [b, y, 1], [b, y, 2]
+   */</span>
+  <span class="kd">public</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;&gt;</span> <span class="nf">cartesianProduct</span><span class="o">(</span><span class="nc">List</span><span class="o">&lt;</span><span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;&gt;</span> <span class="n">listsToJoin</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">listsToJoin</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+    <span class="o">}</span>
+
+    <span class="n">listsToJoin</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">listsToJoin</span><span class="o">);</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="n">firstListToJoin</span> <span class="o">=</span> <span class="n">listsToJoin</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+    <span class="nc">Stream</span><span class="o">&lt;</span><span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;&gt;</span> <span class="n">startProduct</span> <span class="o">=</span> <span class="n">joinLists</span><span class="o">(</span><span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;(),</span> <span class="n">firstListToJoin</span><span class="o">);</span>
+
+    <span class="nc">BinaryOperator</span><span class="o">&lt;</span><span class="nc">Stream</span><span class="o">&lt;</span><span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;&gt;&gt;</span> <span class="n">noOp</span> <span class="o">=</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="kc">null</span><span class="o">;</span>
+
+    <span class="k">return</span> <span class="n">listsToJoin</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span> <span class="c1">//</span>
+        <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="nl">Objects:</span><span class="o">:</span><span class="n">nonNull</span><span class="o">)</span> <span class="c1">//</span>
+        <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="n">list</span> <span class="o">-&gt;</span> <span class="o">!</span><span class="n">list</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="c1">//</span>
+        <span class="o">.</span><span class="na">reduce</span><span class="o">(</span><span class="n">startProduct</span><span class="o">,</span> <span class="nl">CartesianProductUtil:</span><span class="o">:</span><span class="n">joinToCartesianProduct</span><span class="o">,</span> <span class="n">noOp</span><span class="o">)</span> <span class="c1">//</span>
+        <span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="n">toList</span><span class="o">());</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**
+   * @param products [a, b], [x, y]
+   * @param toJoin   [1, 2]
+   * @return [a, b, 1], [a, b, 2], [x, y, 1], [x, y, 2]
+   */</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="nc">Stream</span><span class="o">&lt;</span><span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;&gt;</span> <span class="nf">joinToCartesianProduct</span><span class="o">(</span><span class="nc">Stream</span><span class="o">&lt;</span><span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;&gt;</span> <span class="n">products</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="n">toJoin</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">products</span><span class="o">.</span><span class="na">flatMap</span><span class="o">(</span><span class="n">product</span> <span class="o">-&gt;</span> <span class="n">joinLists</span><span class="o">(</span><span class="n">product</span><span class="o">,</span> <span class="n">toJoin</span><span class="o">));</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**
+   * @param list   [a, b]
+   * @param toJoin [1, 2]
+   * @return [a, b, 1], [a, b, 2]
+   */</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="nc">Stream</span><span class="o">&lt;</span><span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;&gt;</span> <span class="nf">joinLists</span><span class="o">(</span><span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="n">list</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="n">toJoin</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="n">toJoin</span><span class="o">.</span><span class="na">stream</span><span class="o">().</span><span class="na">map</span><span class="o">(</span><span class="n">element</span> <span class="o">-&gt;</span> <span class="n">appendElementToList</span><span class="o">(</span><span class="n">list</span><span class="o">,</span> <span class="n">element</span><span class="o">));</span>
+  <span class="o">}</span>
+
+  <span class="cm">/**
+   * @param list    [a, b]
+   * @param element 1
+   * @return [a, b, 1]
+   */</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="nf">appendElementToList</span><span class="o">(</span><span class="nc">List</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="n">list</span><span class="o">,</span> <span class="no">T</span> <span class="n">element</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">capacity</span> <span class="o">=</span> <span class="n">list</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
+    <span class="nc">ArrayList</span><span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="n">newList</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;(</span><span class="n">capacity</span><span class="o">);</span>
+    <span class="n">newList</span><span class="o">.</span><span class="na">addAll</span><span class="o">(</span><span class="n">list</span><span class="o">);</span>
+    <span class="n">newList</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">element</span><span class="o">);</span>
+    <span class="k">return</span> <span class="nf">unmodifiableList</span><span class="o">(</span><span class="n">newList</span><span class="o">);</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>The code is also available on this <a href="https://gist.github.com/ThomasPr/8e038d5ebca97261940bf1dd13d3417d">GitHub Gist</a>.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2020-12-29T20:40:00+00:00">December 29, 2020</time></p>
+
+
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://github.com/ThomasPr/ThomasPr.github.io" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2020 Thomas' Blog. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

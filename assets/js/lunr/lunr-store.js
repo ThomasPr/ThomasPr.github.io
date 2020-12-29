@@ -10,4 +10,10 @@ var store = [{
         "tags": [],
         "url": "https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions.html",
         "teaser": null
+      },{
+        "title": "Build a Cartesian Product with Java Streams",
+        "excerpt":"Recently, I ran over an old post by Baeldung: Permutations of an Array in Java . He presented very well solutions, as usual. I just want to provide another point of view: Readability. IMHO, readability is one of the most important aspects for code. Some time ago I had to...","categories": ["blog"],
+        "tags": [],
+        "url": "https://thomas.preissler.me/blog/2020/12/29/permutations-using-java-streams.html",
+        "teaser": null
       }]
