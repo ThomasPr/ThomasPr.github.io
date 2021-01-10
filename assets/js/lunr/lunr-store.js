@@ -16,4 +16,10 @@ var store = [{
         "tags": [],
         "url": "https://thomas.preissler.me/blog/2020/12/29/permutations-using-java-streams.html",
         "teaser": null
+      },{
+        "title": "Predicate.not for filtering Java Streams",
+        "excerpt":"Let’s start with an example: userList.stream() .filter(user -&gt; user != null) .filter(user -&gt; !user.isActivated()) .count(); The idea of this code snippet is to count all deactivated users. At first we have to filter all nulls and secondly remove all activated users. The remaining list entries can just be counted. I...","categories": ["blog"],
+        "tags": [],
+        "url": "https://thomas.preissler.me/blog/2021/01/10/predicate-not-for-filtering-java-streams.html",
+        "teaser": null
       }]
