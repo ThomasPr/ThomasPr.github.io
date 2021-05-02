@@ -9,37 +9,41 @@
   <head>
     <meta charset="utf-8">
 
-<!-- begin _includes/seo.html --><title>Thomas' Blog</title>
-<meta name="description" content="My personal thoughts on technology and oddities.">
+<!-- begin _includes/seo.html --><title>Release memory back to the OS with Java 11 - Thomas’ Blog</title>
+<meta name="description" content="Java 11 is by default very reluctant to release unnecessary memory back to the operation system. The Shenandoah GC is more aggressive and is available in Java 11.">
 
 
   <meta name="author" content="Thomas Preißler">
   
+  <meta property="article:author" content="Thomas Preißler">
+  
 
 
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:locale" content="en_US">
 <meta property="og:site_name" content="Thomas' Blog">
-<meta property="og:title" content="Thomas’ Blog">
-<meta property="og:url" content="https://thomas.preissler.me/">
+<meta property="og:title" content="Release memory back to the OS with Java 11">
+<meta property="og:url" content="https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11.html">
 
 
-  <meta property="og:description" content="My personal thoughts on technology and oddities.">
-
-
-
-  <meta property="og:image" content="https://thomas.preissler.me/assets/images/teaser.jpeg">
+  <meta property="og:description" content="Java 11 is by default very reluctant to release unnecessary memory back to the operation system. The Shenandoah GC is more aggressive and is available in Java 11.">
 
 
 
+  <meta property="og:image" content="https://thomas.preissler.me/assets/images/2021-05-02/os2.png">
 
 
 
 
 
+  <meta property="article:published_time" content="2021-05-02T14:19:03+00:00">
 
 
-<link rel="canonical" href="https://thomas.preissler.me/">
+
+
+
+
+<link rel="canonical" href="https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11.html">
 
 
 
@@ -101,7 +105,7 @@
 
   </head>
 
-  <body class="layout--home wide">
+  <body class="layout--single wide">
     <nav class="skip-links">
   <h2 class="screen-reader-text">Skip links</h2>
   <ul>
@@ -145,40 +149,6 @@
 
     <div class="initial-content">
       
-  
-
-
-
-
-
-
-
-<div class="page__hero--overlay"
-  style=" background-image: url('/assets/images/teaser.jpeg');"
->
-  
-    <div class="wrapper">
-      <h1 id="page-title" class="page__title" itemprop="headline">
-        
-          Thomas’ Blog
-
-        
-      </h1>
-      
-        <p class="page__lead"><strong>My personal thoughts on technology and oddities.</strong>
-</p>
-      
-      
-
-
-      
-      
-    </div>
-  
-  
-</div>
-
-
 
 
 
@@ -307,154 +277,100 @@
 
 
 
-  <div class="archive">
-    
-    
-
-
-
-
-
-<div class="entries-list">
-  
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Release memory back to the OS with Java 11">
+    <meta itemprop="description" content="Java 11 is by default very reluctant to release unnecessary memory back to the operation system. The Shenandoah GC is more aggressive and is available in Java 11.">
+    <meta itemprop="datePublished" content="2021-05-02T14:19:03+00:00">
     
 
-
-
-<div class="list__item">
-  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
-    
-    <h2 class="archive__item-title no_toc" itemprop="headline">
+    <div class="page__inner-wrap">
       
-        <a href="/blog/2021/05/02/release-memory-back-to-the-os-with-java-11.html" rel="permalink">Release memory back to the OS with Java 11
-</a>
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Release memory back to the OS with Java 11
+</h1>
+          
+
+
+        </header>
       
-    </h2>
+
+      <section class="page__content" itemprop="text">
+        
+        <p>I’m responsible for a Java application running in OpenShift. This application has to process a huge amount of data occassionally, but most of the time the application idles and waits for new input.</p>
+
+<p>The application takes a huge amount of memory during processing the data. But when the processing job has been completed, the memory can be released and returned to the operating system. Unfortunately, this doesn’t happen. The JVM seems to keep the memory forever.</p>
+
+<p><img src="/assets/images/2021-05-02/os1.png" alt="OpenShift Metrics" /></p>
+
+<h2 id="whats-going-on">What’s going on?</h2>
+
+<blockquote>
+  <p>Currently the G1 garbage collector may not return committed Java heap memory to the operating system in a timely manner. G1 only returns memory from the Java heap at either a full GC or during a concurrent cycle. Since G1 tries hard to completely avoid full GCs, and only triggers a concurrent cycle based on Java heap occupancy and allocation activity, it will not return Java heap memory in many cases unless forced to do so externally. – <a href="https://openjdk.java.net/jeps/346">JEP 346</a></p>
+</blockquote>
+
+<p>The motivation of JEP 346 describes perfectly what I observed from my application. When it should release memory, there’s no need anymore to run the garbage collector at all. Therefore, it will keep the memory until the next huge processing phase starts and requires the memory again.</p>
+
+<h2 id="how-can-this-be-fixed">How can this be fixed?</h2>
+
+<p><a href="https://openjdk.java.net/jeps/346">JEP 346</a> has exactly this issue in mind: Promptly Return Unused Committed Memory from G1. JEP 346 has been implemented in Java 12. Unfortunately, I have to use Java 11 and cannot benefit from this improvment.</p>
+
+<p>But there are other garbage collectors than the default G1. <a href="https://jelastic.com/blog/tuning-garbage-collector-java-memory-usage-optimization/">Ruslan Synytsky</a> has a well-written blog post about the memory consumption of different garbage collectors.</p>
+
+<p>Based on his observations there’s a huge difference in the behaviour of the memory consumption. It seems that the Shenandoah GC might be a really good option for my application. Next to ZGC, Shenandoah is one of the newest garbage collectors and available as production ready in Java 15. But Shenandoah has been backported to OpenJDK 11 and is available since version 11.0.9. Therefore I’m able to use it. Let’s give it a try:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java -XX:+UseShenandoahGC -jar app.jar
+</code></pre></div></div>
+
+<p><img src="/assets/images/2021-05-02/os2.png" alt="OpenShift Metrics" /></p>
+
+<p>It works! As you can see, some time after finishing the hard processing work, Shenandoah returns most of the memory back to the operating system.</p>
+
+<p>Since reducing the heap is an expensive operation, Shenandoah takes a delay of 5 minutes (300,000 ms) by default to release any memory back to the operating system. You can set Shenandoah to be more aggressive, but the command line options for tuning Shenandoah are still marked as experimental. However, I’m fine with the default 5 minute delay.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java <span class="se">\</span>
+  <span class="nt">-XX</span>:+UseShenandoahGC <span class="se">\</span>
+  <span class="nt">-XX</span>:+UnlockExperimentalVMOptions <span class="se">\</span>
+  <span class="nt">-XX</span>:ShenandoahUncommitDelay<span class="o">=</span>1000 <span class="se">\</span>
+  <span class="nt">-XX</span>:ShenandoahGuaranteedGCInterval<span class="o">=</span>10000 <span class="se">\</span>
+  <span class="nt">-jar</span> app.jar
+</code></pre></div></div>
+
+<h2 id="links">Links</h2>
+
+<ul>
+  <li><a href="https://openjdk.java.net/jeps/346">JEP 346: Promptly Return Unused Committed Memory from G1</a></li>
+  <li><a href="https://jelastic.com/blog/tuning-garbage-collector-java-memory-usage-optimization/">Garbage Collector Tuning as the First Step to Java Memory Usage Optimization</a></li>
+  <li><a href="http://clojure-goes-fast.com/blog/shenandoah-in-production/">Shenandoah GC in production: experience report</a></li>
+  <li><a href="https://stackoverflow.com/questions/30458195/does-gc-release-back-memory-to-os">Stackoverflow: Does GC release back memory to OS?</a></li>
+  <li><a href="https://stackoverflow.com/questions/59362760/does-g1gc-release-back-memory-to-the-os-even-if-xms-xmx">Stackoverflow: Does G1 GC release back memory to the OS even if Xms = Xmx?</a></li>
+</ul>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2021-05-02T14:19:03+00:00">May 2, 2021</time></p>
+
+
+      </footer>
+
+      
+
+      
+    </div>
+
     
-
-
-    <p class="archive__item-excerpt" itemprop="description">Java 11 is by default very reluctant to release unnecessary memory back to the operation system. The Shenandoah GC is more aggressive and is available in Jav...</p>
   </article>
-</div>
 
   
-    
-
-
-
-<div class="list__item">
-  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
-    
-    <h2 class="archive__item-title no_toc" itemprop="headline">
-      
-        <a href="/blog/2021/03/25/java-streams-are-not-always-a-good-fit-for-readability.html" rel="permalink">Java Streams are not always a good fit for readability
-</a>
-      
-    </h2>
-    
-
-
-    <p class="archive__item-excerpt" itemprop="description">Java Streams are powerful but need to be get special attentation to keep the implementation readable.
-</p>
-  </article>
-</div>
-
-  
-    
-
-
-
-<div class="list__item">
-  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
-    
-    <h2 class="archive__item-title no_toc" itemprop="headline">
-      
-        <a href="/blog/2021/01/10/predicate-not-for-filtering-java-streams.html" rel="permalink">Predicate.not for filtering Java Streams
-</a>
-      
-    </h2>
-    
-
-
-    <p class="archive__item-excerpt" itemprop="description">Predicate.not is handy to filter streams with method references for the opposite of a provided method
-</p>
-  </article>
-</div>
-
-  
-    
-
-
-
-<div class="list__item">
-  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
-    
-    <h2 class="archive__item-title no_toc" itemprop="headline">
-      
-        <a href="/blog/2020/12/29/permutations-using-java-streams.html" rel="permalink">Build a Cartesian Product with Java Streams
-</a>
-      
-    </h2>
-    
-
-
-    <p class="archive__item-excerpt" itemprop="description">Building a Cartesian Product or Permutation is challenging. I used Java Streams to implement a readable algorithm.
-</p>
-  </article>
-</div>
-
-  
-    
-
-
-
-<div class="list__item">
-  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
-    
-    <h2 class="archive__item-title no_toc" itemprop="headline">
-      
-        <a href="/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions.html" rel="permalink">Build my Jekyll blog with bare GitHub Actions
-</a>
-      
-    </h2>
-    
-
-
-    <p class="archive__item-excerpt" itemprop="description">Use GitHub Actions without third-party marketplace Actions to build my Jekyll blog. Publish the generated content on GitHub Pages.
-</p>
-  </article>
-</div>
-
-  
-    
-
-
-
-<div class="list__item">
-  <article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">
-    
-    <h2 class="archive__item-title no_toc" itemprop="headline">
-      
-        <a href="/blog/2020/12/20/make-decisions-about-a-blogging-system.html" rel="permalink">Make decisions about a blogging system
-</a>
-      
-    </h2>
-    
-
-
-    <p class="archive__item-excerpt" itemprop="description">It was a challenging task to decide which software I want to use for this blog.
-</p>
-  </article>
-</div>
-
   
 </div>
 
-
-
-
-  </div>
-</div>
     </div>
 
     

@@ -1,4 +1,51 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://thomas.preissler.me/feed.xml" rel="self" type="application/atom+xml" /><link href="https://thomas.preissler.me/" rel="alternate" type="text/html" /><updated>2021-03-25T22:08:49+00:00</updated><id>https://thomas.preissler.me/feed.xml</id><title type="html">Thomas’ Blog</title><subtitle>My personal thoughts on technology and oddities.</subtitle><author><name>Thomas Preißler</name></author><entry><title type="html">Java Streams are not always a good fit for readability</title><link href="https://thomas.preissler.me/blog/2021/03/25/java-streams-are-not-always-a-good-fit-for-readability.html" rel="alternate" type="text/html" title="Java Streams are not always a good fit for readability" /><published>2021-03-25T22:03:03+00:00</published><updated>2021-03-25T22:03:03+00:00</updated><id>https://thomas.preissler.me/blog/2021/03/25/java-streams-are-not-always-a-good-fit-for-readability</id><content type="html" xml:base="https://thomas.preissler.me/blog/2021/03/25/java-streams-are-not-always-a-good-fit-for-readability.html">&lt;p&gt;I really like functional programming, it offers powerful expressions with only a few lines of code. When Streams have been introduced in Java 8, they where a huge improvement for someone like me who got used to ruby and its functional power for quite some time.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://thomas.preissler.me/feed.xml" rel="self" type="application/atom+xml" /><link href="https://thomas.preissler.me/" rel="alternate" type="text/html" /><updated>2021-05-02T17:59:41+00:00</updated><id>https://thomas.preissler.me/feed.xml</id><title type="html">Thomas’ Blog</title><subtitle>My personal thoughts on technology and oddities.</subtitle><author><name>Thomas Preißler</name></author><entry><title type="html">Release memory back to the OS with Java 11</title><link href="https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11.html" rel="alternate" type="text/html" title="Release memory back to the OS with Java 11" /><published>2021-05-02T14:19:03+00:00</published><updated>2021-05-02T14:19:03+00:00</updated><id>https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11</id><content type="html" xml:base="https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11.html">&lt;p&gt;I’m responsible for a Java application running in OpenShift. This application has to process a huge amount of data occassionally, but most of the time the application idles and waits for new input.&lt;/p&gt;
+
+&lt;p&gt;The application takes a huge amount of memory during processing the data. But when the processing job has been completed, the memory can be released and returned to the operating system. Unfortunately, this doesn’t happen. The JVM seems to keep the memory forever.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2021-05-02/os1.png&quot; alt=&quot;OpenShift Metrics&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;whats-going-on&quot;&gt;What’s going on?&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Currently the G1 garbage collector may not return committed Java heap memory to the operating system in a timely manner. G1 only returns memory from the Java heap at either a full GC or during a concurrent cycle. Since G1 tries hard to completely avoid full GCs, and only triggers a concurrent cycle based on Java heap occupancy and allocation activity, it will not return Java heap memory in many cases unless forced to do so externally. – &lt;a href=&quot;https://openjdk.java.net/jeps/346&quot;&gt;JEP 346&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The motivation of JEP 346 describes perfectly what I observed from my application. When it should release memory, there’s no need anymore to run the garbage collector at all. Therefore, it will keep the memory until the next huge processing phase starts and requires the memory again.&lt;/p&gt;
+
+&lt;h2 id=&quot;how-can-this-be-fixed&quot;&gt;How can this be fixed?&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://openjdk.java.net/jeps/346&quot;&gt;JEP 346&lt;/a&gt; has exactly this issue in mind: Promptly Return Unused Committed Memory from G1. JEP 346 has been implemented in Java 12. Unfortunately, I have to use Java 11 and cannot benefit from this improvment.&lt;/p&gt;
+
+&lt;p&gt;But there are other garbage collectors than the default G1. &lt;a href=&quot;https://jelastic.com/blog/tuning-garbage-collector-java-memory-usage-optimization/&quot;&gt;Ruslan Synytsky&lt;/a&gt; has a well-written blog post about the memory consumption of different garbage collectors.&lt;/p&gt;
+
+&lt;p&gt;Based on his observations there’s a huge difference in the behaviour of the memory consumption. It seems that the Shenandoah GC might be a really good option for my application. Next to ZGC, Shenandoah is one of the newest garbage collectors and available as production ready in Java 15. But Shenandoah has been backported to OpenJDK 11 and is available since version 11.0.9. Therefore I’m able to use it. Let’s give it a try:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;java -XX:+UseShenandoahGC -jar app.jar
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2021-05-02/os2.png&quot; alt=&quot;OpenShift Metrics&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It works! As you can see, some time after finishing the hard processing work, Shenandoah returns most of the memory back to the operating system.&lt;/p&gt;
+
+&lt;p&gt;Since reducing the heap is an expensive operation, Shenandoah takes a delay of 5 minutes (300,000 ms) by default to release any memory back to the operating system. You can set Shenandoah to be more aggressive, but the command line options for tuning Shenandoah are still marked as experimental. However, I’m fine with the default 5 minute delay.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;java &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-XX&lt;/span&gt;:+UseShenandoahGC &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-XX&lt;/span&gt;:+UnlockExperimentalVMOptions &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-XX&lt;/span&gt;:ShenandoahUncommitDelay&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1000 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-XX&lt;/span&gt;:ShenandoahGuaranteedGCInterval&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10000 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;-jar&lt;/span&gt; app.jar
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;links&quot;&gt;Links&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://openjdk.java.net/jeps/346&quot;&gt;JEP 346: Promptly Return Unused Committed Memory from G1&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://jelastic.com/blog/tuning-garbage-collector-java-memory-usage-optimization/&quot;&gt;Garbage Collector Tuning as the First Step to Java Memory Usage Optimization&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://clojure-goes-fast.com/blog/shenandoah-in-production/&quot;&gt;Shenandoah GC in production: experience report&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://stackoverflow.com/questions/30458195/does-gc-release-back-memory-to-os&quot;&gt;Stackoverflow: Does GC release back memory to OS?&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://stackoverflow.com/questions/59362760/does-g1gc-release-back-memory-to-the-os-even-if-xms-xmx&quot;&gt;Stackoverflow: Does G1 GC release back memory to the OS even if Xms = Xmx?&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Thomas Preißler</name></author><category term="blog" /><summary type="html">Java 11 is by default very reluctant to release unnecessary memory back to the operation system. The Shenandoah GC is more aggressive and is available in Java 11.</summary></entry><entry><title type="html">Java Streams are not always a good fit for readability</title><link href="https://thomas.preissler.me/blog/2021/03/25/java-streams-are-not-always-a-good-fit-for-readability.html" rel="alternate" type="text/html" title="Java Streams are not always a good fit for readability" /><published>2021-03-25T22:03:03+00:00</published><updated>2021-03-25T22:03:03+00:00</updated><id>https://thomas.preissler.me/blog/2021/03/25/java-streams-are-not-always-a-good-fit-for-readability</id><content type="html" xml:base="https://thomas.preissler.me/blog/2021/03/25/java-streams-are-not-always-a-good-fit-for-readability.html">&lt;p&gt;I really like functional programming, it offers powerful expressions with only a few lines of code. When Streams have been introduced in Java 8, they where a huge improvement for someone like me who got used to ruby and its functional power for quite some time.&lt;/p&gt;
 
 &lt;p&gt;Even if Java Streams are a good choice for many problems, they might be not the best choice for readability. I want to show you an example where I struggeled for a good solution. Java Streams sound like the perfect solution for that kind of problem.&lt;/p&gt;
 

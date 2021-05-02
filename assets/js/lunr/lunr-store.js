@@ -28,4 +28,10 @@ var store = [{
         "tags": [],
         "url": "/blog/2021/03/25/java-streams-are-not-always-a-good-fit-for-readability.html",
         "teaser": null
+      },{
+        "title": "Release memory back to the OS with Java 11",
+        "excerpt":"I’m responsible for a Java application running in OpenShift. This application has to process a huge amount of data occassionally, but most of the time the application idles and waits for new input. The application takes a huge amount of memory during processing the data. But when the processing job...","categories": ["blog"],
+        "tags": [],
+        "url": "/blog/2021/05/02/release-memory-back-to-the-os-with-java-11.html",
+        "teaser": null
       }]
