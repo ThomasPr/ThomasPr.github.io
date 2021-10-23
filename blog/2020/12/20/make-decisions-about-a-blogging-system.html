@@ -89,6 +89,87 @@
 
     <link rel="icon" href="/assets/images/thomas.jpg" type="image/jpeg" />
 
+<script type="application/ld+json">
+  
+
+  
+    {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "url": "https://thomas.preissler.me/blog/2020/12/20/make-decisions-about-a-blogging-system",
+  "name": "Make decisions about a blogging system",
+  "headline": "Make decisions about a blogging system",
+  "keywords": "",
+  "description": "It was a challenging task to decide which software I want to use for this blog.",
+  "articleBody": "I’m a person who really thinks twice about the future development of his decisions, especially when it comes to a system that I probably use for years. It took me ages to set up a blog like this, but in the end it was just a matter of minutes. In this very first blog post I want to walk through the rationale that led me to the current setup.\n\nMy Requirements\n\n\n  Having the content under version control (git)\n  No vendor lock-in\n  No burden for recurring maintence like security updates\n  Use my own domain\n  Fully customizable layout and content to fit my needs\n  No WYSIWYG-editor, the HTML code looks always a bit creepy\n\n\nThe Alternatives\n\nThere are many services and software out there to get almost the same result. Basically they can be grouped into four categories:\n\nSoftware as a Service\n\nProviders who offer a fully-featured system hosted and managed by them. You only need to sign up for their service and can start writing your first post.\n\nThe most popular blogging provider is workpress.com who provides a hosting instance of WordPress. Please be aware about the difference of the provider WordPress.com and the software WordPress. Other well-known providers are wix.com or jimdo.com, but there are many more out there.\n\nSoftware installed on your own server\n\nSoftware to be installed and managed by your own on your own server. Mostly, you need a php-powered webspace with a database and upload the software to this webspace. After entering some configuration options you can start blogging. The setup is quite easy and many webspace providers offer a one-click installation where they automated the hassle of installing and configuring the software. However, it’s very uncommon to install software updates and offer migrations in a one-click fashion. WordPress is the the most popular software, but only one out of a huge list.\n\nStatic site generators\n\nSince I do not plan to offer any dynamic content like comments, contact forms or user login, the blog itself can be run by static pages only. A static site generator where I create the content locally, generate the web page and upload that to web server is a valid option for my requirements. The generated pages can be uploaded to AWS S3 or even simpler just to GitHub Pages. Static site generators are not that common, but some of the known ones are Jekyll, Hugo or Middleman.\n\nDevelop the software by my own\n\nThis feels like re-inventing the wheel once again, but this will be the most flexible and most customizable solution. Since I’m a professional software developer, I have quite some experience to develop my own software.\n\nMy Decision\n\nIt took ages from the idea to blog by myself until I finally was able to write this blog post you’re reading right now. Let me show you my opinion about the options:\n\n\n  Software as a Service: This seems to be the worst option, I’m hardly able to move my content, have to use a WYSIWYG editor and be unable to fully customize my blog. Therefore, I won’t go for that.\n  Software installed on my own server: Thats a much better option, at least I’m able to access the content in the database. But even if I can modify the software and therefore my blog therotically, I don’t have much experience with PHP which is used by many blog engines such as WordPress.\n  Static site generators: Seems to be a good option, I don’t have to deal with security updates, they’re usually simple enough for easy layout changes and depending on the hosting I’m able to use my own domain.\n  Developing my own software: A very flexible but very time-consuming option. Since I don’t want to focus on blogging itself, not on the blogging software, this option is not my preference. Additionally, I still have to deal with security updates, even worse I have to find and fix them by my own.\n\n\nIn the end, I just decided to go for a static site generator: I really like the simplicity and the broad hosting options. Since I already spend so many time to for that decision, I just took the one that I alredy knew from the past: Jekyll. For the hosting part I’ll go for GitHub Pages who offers an incredible easy way to host static pages and even more actually generate the static pages based of the Jekyll content.\n\nCheck out my public repository on GitHub to see final result:\n\n  The master branch contains the Jekyll content\n  The gh-pages branch contains the generated static pages which are visible in the blog\n\n\n",
+  "datePublished": "2020-12-20 21:43:50 +0000",
+  "dateModified": "2020-12-20 21:43:50 +0000",
+  "author": {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Thomas Preißler",
+  "givenName": "Thomas",
+  "familyName": "Preißler",
+  "gender": "Male",
+  "email": "thomas@preissler.me",
+  "jobTitle": "Software Engineer",
+  "nationality": "Germany",
+  "url": "https://thomas.preissler.me",
+  "image": "https://thomas.preissler.me/assets/images/thomas.jpg",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Freiburg im Breisgau",
+    "addressCountry": "Germany"
+  },
+  "worksFor": [
+    {
+      "@type": "Organization",
+      "name": "NTT DATA DACH",
+      "sameAs": [
+        "https://de.nttdata.com/"
+      ]
+    }
+  ],
+  "alumniOf": [
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "TU Wien",
+      "sameAs": "https://www.tuwien.at/"
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "Staffordshire University",
+      "sameAs": "https://www.staffs.ac.uk/"
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "Technische Hochschule Rosenheim",
+      "sameAs": "https://www.th-rosenheim.de"
+    }
+  ],
+  "sameAs": [
+    "https://twitter.com/TheThomasPr",
+    "https://github.com/ThomasPr",
+    "https://stackoverflow.com/users/915955/thomas-prei%c3%9fler",
+    "https://www.xing.com/profile/Thomas_Preissler",
+    "https://www.linkedin.com/in/thomas-preissler"
+  ]
+}
+,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://thomas.preissler.me/blog/2020/12/20/make-decisions-about-a-blogging-system"
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://thomas.preissler.me"
+  }
+}
+
+  
+</script>
+
+
   </head>
 
   <body class="layout--single wide">

@@ -91,6 +91,87 @@
 
     <link rel="icon" href="/assets/images/thomas.jpg" type="image/jpeg" />
 
+<script type="application/ld+json">
+  
+
+  
+    {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "url": "https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions",
+  "name": "Build my Jekyll blog with bare GitHub Actions",
+  "headline": "Build my Jekyll blog with bare GitHub Actions",
+  "keywords": "",
+  "description": "Use GitHub Actions without third-party marketplace Actions to build my Jekyll blog. Publish the generated content on GitHub Pages.",
+  "articleBody": "I use Jekyll to create my blog. It allows me to focus on writing the content with markdown and afterwards to generate a static HTML page that can be published easily.\n\nNext to Jekyll there are three additional components, all provided by GitHub:\n\n\n  source control for the raw blog content\n  generating the static page with GitHub Actions\n  hosting the generated static page with GitHub Pages\n\n\nOf course, there are many other options if you don’t prefer GitHub. You could also distribute these components to different providers. However, I like the simplicity and completness of GitHub. Additionally, GitHub is free of charge for my purposes.\n\nYou can check out the final results in my public repository. No worries, we’ll walk through the necessary steps.\n\n1. Create Jekyll page\n\nThis is not a blog post about Jekyll, they provide a good documentation. Just have a look at the Jekyll Quickstart to get started with Jekyll.\n\n2. Push Jekyll page\n\nPush the newly created Jekyll page to the master branch of a newly created GitHub repository.\n\nIn this example we’ll use the master branch for the raw Jekyll page, it’s the branch where I commit and push all the changes I make. In contrast to that, the gh-pages branch will contain the automatically generated static HTML page where only the GitHub Action will push into.\n\n3. Add the GitHub Action\n\nA GitHub Action is a list of commands that will be executed after an event occurs, such as a new commit. It needs to be defined as a yaml file inside the .github/workflows folder of the repository. In our case, the GitHub Action is the important piece that is responsible for generating the static page out of the Jekyll source.\n\nAdditionally, I don’t want to rely on any third-party marketplace Actions. They might be orphaned after some time or contain unwanted side-effects. So, I’ll just use the Actions and commands provided by GitHub itself.\n\nIn contrast to automate the workflow by utilizing a GitHub Action, you could manually run jekyll build on your local machine and upload the _site directory to a server every time you make changes to your blog. Basically, the GitHub Action will do the same, but it will take the burden for this boring recurring task.\n\nYou can see my complete GitHub Action here.\n\nTo be clear, the following steps are necessary:\n\n\n  Checkout the master branch\n  Install Ruby and the dependencies from the Gemfile\n  Run jekyll build\n  Push the generated HTML files to the gh-pages branch\n\n\nLet me walk you through the important steps:\n\nCheckout\n\n- name: checkout master\n  uses: actions/checkout@v2\n\n- name: checkout gh-pages\n  uses: actions/checkout@v2\n  with:\n    ref: 'gh-pages'\n    path: 'gh-pages'\n\n\nBoth branches, master and gh-pages, will be checked out so that the gh-pages branch resides in the subfolder gh-pages. Later on, Jekyll will write its output into this gh-pages folder.\n\nInstall Ruby and dependencies\n\n- name: setup ruby\n  uses: actions/setup-ruby@v1\n  with:\n    ruby-version: 2.7\n\n- name: cache gems\n  uses: actions/cache@v2\n  with:\n    path: vendor/bundle\n    key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}\n    restore-keys: ${{ runner.os }}-gems-\n\n- name: bundle install\n  run: |\n    bundle install --path=vendor/bundle --jobs 4 --retry 3\n    bundle clean\n\n\nThe three steps should be quite self-explaining. setup ruby takes care that ruby will be available for future steps and bundle install will install all gems as defined in the Gemfile.lock.\n\nThe caching might not be obvious: It takes about three minutes to install all dependencies from scratch. But what if we could save this time by re-using the installed gems from a previous run? That’s exaclty what the cache gems step does. After each run of the GitHub Action it takes the folder vendor/bundle, puts that into a zip-archive and restores it before the next run. We just need to make sure that bundle install also uses the folder vendor/bundle for storing the gems. This will bring the build time down from over three minutes to less than thirty seconds.\n\nBuild the static page\n\n- name: jekyll build\n  run: JEKYLL_ENV=production bundle exec jekyll build --destination gh-pages\n\n\nThats the main step in our GitHub Action, it actually takes Jekyll to generate the static HTML page. Please note that we specify the gh-pages folder as the destination for the jekyll build step. Remember, that we checked out the gh-pages branch from our repository into this gh-pages folder.\n\nPush the generated static page\n\n- name: push gh-pages\n  run: |\n    cd gh-pages &amp;&amp; \\\n    git config user.name \"${GITHUB_ACTOR}\" &amp;&amp; \\\n    git config user.email \"${GITHUB_ACTOR}@users.noreply.github.com\" &amp;&amp; \\\n    git add . &amp;&amp; \\\n    git commit -m \"jekyll build from Action ${GITHUB_SHA}\" &amp;&amp; \\\n    git push\n\n\nWe’re switching into the folder gh-pages which has been created based on the branch gh-pages and which contains the latest changes to our static page from the last jekyll build. This step just commits and pushes any changes in this folder to the gh-pages branch to get the static page that we can publish on the web. Actually, this step creates the HTML pages shown to a blog visitor.\n\nSee the GitHub Action in action\n\nOnce you committed and pushed this workflow-file into the master branch the GitHub Action should be executed. To verify that, click on the Action tab of your Repository and see your newly created Action. The first run can take a couple of minutes.\n\n\n\n4. Enable GitHub Pages\n\nThe last task is to enable the hosting of the generated static page content. Just make sure that the GitHub Action has been completed successfully before you continue.\n\nTo enable GitHub Pages for your repository open the Settings tab and scroll down a little bit. You should see a section named “GitHub Pages”.\n\n\n\nThe only required setting is to change the Source to the gh-pages branch. But I strongly recommend to also enable the “Enforce HTTPS” setting.\n\nThats it. The blog is up and running. Every time I push a change to my blog, the GitHub Action is triggered and the updated static HTML page is published.\n",
+  "datePublished": "2020-12-26 09:55:03 +0000",
+  "dateModified": "2020-12-26 09:55:03 +0000",
+  "author": {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Thomas Preißler",
+  "givenName": "Thomas",
+  "familyName": "Preißler",
+  "gender": "Male",
+  "email": "thomas@preissler.me",
+  "jobTitle": "Software Engineer",
+  "nationality": "Germany",
+  "url": "https://thomas.preissler.me",
+  "image": "https://thomas.preissler.me/assets/images/thomas.jpg",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Freiburg im Breisgau",
+    "addressCountry": "Germany"
+  },
+  "worksFor": [
+    {
+      "@type": "Organization",
+      "name": "NTT DATA DACH",
+      "sameAs": [
+        "https://de.nttdata.com/"
+      ]
+    }
+  ],
+  "alumniOf": [
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "TU Wien",
+      "sameAs": "https://www.tuwien.at/"
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "Staffordshire University",
+      "sameAs": "https://www.staffs.ac.uk/"
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "Technische Hochschule Rosenheim",
+      "sameAs": "https://www.th-rosenheim.de"
+    }
+  ],
+  "sameAs": [
+    "https://twitter.com/TheThomasPr",
+    "https://github.com/ThomasPr",
+    "https://stackoverflow.com/users/915955/thomas-prei%c3%9fler",
+    "https://www.xing.com/profile/Thomas_Preissler",
+    "https://www.linkedin.com/in/thomas-preissler"
+  ]
+}
+,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions"
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://thomas.preissler.me/assets/images/2020-12-26/github-action.png"
+  }
+}
+
+  
+</script>
+
+
   </head>
 
   <body class="layout--single wide">

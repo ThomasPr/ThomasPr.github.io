@@ -91,6 +91,87 @@
 
     <link rel="icon" href="/assets/images/thomas.jpg" type="image/jpeg" />
 
+<script type="application/ld+json">
+  
+
+  
+    {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "url": "https://thomas.preissler.me/blog/2021/01/10/predicate-not-for-filtering-java-streams",
+  "name": "Predicate.not for filtering Java Streams",
+  "headline": "Predicate.not for filtering Java Streams",
+  "keywords": "",
+  "description": "Predicate.not is handy to filter streams with method references for the opposite of a provided method",
+  "articleBody": "Let’s start with an example:\n\nuserList.stream()\n  .filter(user -&gt; user != null)\n  .filter(user -&gt; !user.isActivated())\n  .count();\n\n\nThe idea of this code snippet is to count all deactivated users. At first we have to filter all nulls and secondly remove all activated users. The remaining list entries can just be counted.\n\nI want to focus on the two filter methods. IMHO using method references should be preferred. Let me show that by an example which filters for the opposite. Please keep in mind that this will throw a NullPointerException since we call isActivated only on nulls.\n\nuserList.stream()\n  .filter(Objects::isNull)\n  .filter(User::isActivated)\n  .count();\n\n\nWouldn’t you agree that the method reference User::isActivated is much easier to read than user -&gt; !user.isActivated()? But we do not want to filter for activated users, but for de-activated users. We could achieve that be implementing a isDeactivated method in the User class, but I want to show you a different way.\n\nIt’s the very same idea for remove null objects from the list. It’s really nice to just write .filter(Objects::isNull) to find only nulls, but I always wrote .filter(u -&gt; u != null) in the past to get only non-nulls.\n\nUntil today, I never took the time to look for an easier way. But there are two very nice (and obvious) solutions:\n\nObjects::nonNull\n\nIn the Objects class there exists not only the isNull method, but also nonNull to achieve exactly the behaviour I need.\n\nuserList.stream()\n  .filter(Objects::nonNull)\n  .count()\n\n\nPredicate::not\n\nThe Predicate interface has a handy not method to negate any Predicate. It’s concise and easy to understand when using a static import for the Predicate.not method\n\nuserList.stream()\n  .filter(not(Objects::isNull))\n  .filter(not(User::isActivated))\n  .count();\n\nPredicate.not is more powerful, it allows to negate any filter option, e.g. to remove empty lists out of a list of lists:\n\nBy combining the two approaches, we are again able to use method references to count all deactivated users:\n\nuserList.stream()\n  .filter(Objects::nonNull)\n  .filter(not(User::isActivated)\n  .count();\n\n\nFiltering Java Streams can be very concise by using method references. To achieve the opposite of a provided method, Predicate.not is a handy solution.\n",
+  "datePublished": "2021-01-10 14:07:00 +0000",
+  "dateModified": "2021-01-10 14:07:00 +0000",
+  "author": {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Thomas Preißler",
+  "givenName": "Thomas",
+  "familyName": "Preißler",
+  "gender": "Male",
+  "email": "thomas@preissler.me",
+  "jobTitle": "Software Engineer",
+  "nationality": "Germany",
+  "url": "https://thomas.preissler.me",
+  "image": "https://thomas.preissler.me/assets/images/thomas.jpg",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Freiburg im Breisgau",
+    "addressCountry": "Germany"
+  },
+  "worksFor": [
+    {
+      "@type": "Organization",
+      "name": "NTT DATA DACH",
+      "sameAs": [
+        "https://de.nttdata.com/"
+      ]
+    }
+  ],
+  "alumniOf": [
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "TU Wien",
+      "sameAs": "https://www.tuwien.at/"
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "Staffordshire University",
+      "sameAs": "https://www.staffs.ac.uk/"
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "Technische Hochschule Rosenheim",
+      "sameAs": "https://www.th-rosenheim.de"
+    }
+  ],
+  "sameAs": [
+    "https://twitter.com/TheThomasPr",
+    "https://github.com/ThomasPr",
+    "https://stackoverflow.com/users/915955/thomas-prei%c3%9fler",
+    "https://www.xing.com/profile/Thomas_Preissler",
+    "https://www.linkedin.com/in/thomas-preissler"
+  ]
+}
+,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://thomas.preissler.me/blog/2021/01/10/predicate-not-for-filtering-java-streams"
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://thomas.preissler.me/assets/images/2021-01-10/filter.png"
+  }
+}
+
+  
+</script>
+
+
   </head>
 
   <body class="layout--single wide">
