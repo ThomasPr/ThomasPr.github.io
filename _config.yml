@@ -26,7 +26,7 @@ url: "https://thomas.preissler.me" # the base hostname & protocol for your site,
 
 google_site_verification: VhaciMaca92rdlXRrqBBFXCR1hxERcyhW4Kqq7XafWM
 
-permalink: /blog/:title
+permalink: /blog/:year/:month/:day/:title
 
 # Build settings
 theme: minimal-mistakes-jekyll
