@@ -75,6 +75,7 @@ social:
     - "https://github.com/ThomasPr"
     - "https://stackoverflow.com/users/915955/thomas-prei%c3%9fler"
     - "https://www.xing.com/profile/Thomas_Preissler"
+    - "https://www.linkedin.com/in/thomas-preissler/"
 
 footer:
   links:
@@ -103,3 +104,6 @@ author:
     - label: "Xing"
       icon: "fab fa-fw fa-xing"
       url: "https://www.xing.com/profile/Thomas_Preissler"
+    - label: "LinkedIn"
+      icon: "fab fa-fw fa-linkedin"
+      url: "https://www.linkedin.com/in/thomas-preissler"
