@@ -107,7 +107,6 @@ PLATFORMS
 DEPENDENCIES
   jekyll (~> 4.2.0)
   jekyll-feed
-  jekyll-include-cache
   jekyll-sitemap
   minimal-mistakes-jekyll
   tzinfo (~> 1.2)
