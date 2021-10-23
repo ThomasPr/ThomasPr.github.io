@@ -1,1 +1,12 @@
 <link rel="icon" href="/assets/images/thomas.jpg" type="image/jpeg" />
+
+<script type="application/ld+json">
+  {% if page.url == "/" %}
+    {% include head/person.json %}
+  {% endif %}
+
+  {% if page.categories contains "blog" %}
+    {% include head/article.json %}
+  {% endif %}
+</script>
+
