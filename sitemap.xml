@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>https://thomas.preissler.me/blog/2020/12/20/make-decisions-about-a-blogging-system.html</loc>
+<loc>https://thomas.preissler.me/blog/make-decisions-about-a-blogging-system</loc>
 <lastmod>2020-12-20T21:43:50+00:00</lastmod>
 </url>
 <url>
-<loc>https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions.html</loc>
+<loc>https://thomas.preissler.me/blog/build-my-jekyll-blog-with-bare-github-actions</loc>
 <lastmod>2020-12-26T09:55:03+00:00</lastmod>
 </url>
 <url>
-<loc>https://thomas.preissler.me/blog/2020/12/29/permutations-using-java-streams.html</loc>
+<loc>https://thomas.preissler.me/blog/permutations-using-java-streams</loc>
 <lastmod>2020-12-29T20:40:00+00:00</lastmod>
 </url>
 <url>
-<loc>https://thomas.preissler.me/blog/2021/01/10/predicate-not-for-filtering-java-streams.html</loc>
+<loc>https://thomas.preissler.me/blog/predicate-not-for-filtering-java-streams</loc>
 <lastmod>2021-01-10T14:07:00+00:00</lastmod>
 </url>
 <url>
-<loc>https://thomas.preissler.me/blog/2021/03/25/java-streams-are-not-always-a-good-fit-for-readability.html</loc>
+<loc>https://thomas.preissler.me/blog/java-streams-are-not-always-a-good-fit-for-readability</loc>
 <lastmod>2021-03-25T22:03:03+00:00</lastmod>
 </url>
 <url>
-<loc>https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11.html</loc>
+<loc>https://thomas.preissler.me/blog/release-memory-back-to-the-os-with-java-11</loc>
 <lastmod>2021-05-02T14:19:03+00:00</lastmod>
 </url>
 <url>
