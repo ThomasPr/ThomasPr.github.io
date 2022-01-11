@@ -243,4 +243,4 @@ containerElement.scrollLeft =
 
 You can find the full source of the zooming feature code on [Github](https://github.com/ThomasPr/timeline/blob/main/scrollable.js).
 
-Comments are welcome on Twitter or LinkedIn.
+Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1481034995418476544) or [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:6886800961994559488/).
