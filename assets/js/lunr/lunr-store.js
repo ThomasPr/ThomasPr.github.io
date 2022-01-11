@@ -34,4 +34,10 @@ var store = [{
         "tags": [],
         "url": "/blog/2021/05/02/release-memory-back-to-the-os-with-java-11",
         "teaser": null
+      },{
+        "title": "Implementing a timeline with scrolling and zooming - or how I failed at elementary school math",
+        "excerpt":"Recently I had the task of implementing a timeline. Not a big deal? You’re probably right, it’s just a bit of Flexbox magic. But there are three challenges: The events in the timeline are not equally distributed and the space between the events need to follow that. Since the timeline...","categories": ["blog"],
+        "tags": [],
+        "url": "/blog/2022/01/10/implementing-a-timeline-with-scrolling-and-zooming-or-how-i-failed-at-elementary-school-math",
+        "teaser": null
       }]

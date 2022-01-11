@@ -1,0 +1,667 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Implementing a timeline with scrolling and zooming - or how I failed at elementary school math - Thomas’ Blog</title>
+<meta name="description" content="I had to implement a timeline that can be scrolled and zoomed. I faced some challenges, but was doing quite well. Until I ran into some issues that took quite some time to work out. In the end, I failed measurably at some very basic elementary school math.">
+
+
+  <meta name="author" content="Thomas Preißler">
+  
+  <meta property="article:author" content="Thomas Preißler">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Thomas' Blog">
+<meta property="og:title" content="Implementing a timeline with scrolling and zooming - or how I failed at elementary school math">
+<meta property="og:url" content="https://thomas.preissler.me/blog/2022/01/10/implementing-a-timeline-with-scrolling-and-zooming-or-how-i-failed-at-elementary-school-math">
+
+
+  <meta property="og:description" content="I had to implement a timeline that can be scrolled and zoomed. I faced some challenges, but was doing quite well. Until I ran into some issues that took quite some time to work out. In the end, I failed measurably at some very basic elementary school math.">
+
+
+
+  <meta property="og:image" content="https://thomas.preissler.me/assets/images/2022-01-10/timeline-scrolling-zooming-og.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2022-01-10T20:18:32+00:00">
+
+
+
+
+
+
+<link rel="canonical" href="https://thomas.preissler.me/blog/2022/01/10/implementing-a-timeline-with-scrolling-and-zooming-or-how-i-failed-at-elementary-school-math">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Thomas Preißler",
+      "url": "https://thomas.preissler.me/",
+      "sameAs": ["https://twitter.com/TheThomasPr","https://github.com/ThomasPr","https://stackoverflow.com/users/915955/thomas-prei%c3%9fler","https://www.xing.com/profile/Thomas_Preissler","https://www.linkedin.com/in/thomas-preissler/"]
+    
+  }
+</script>
+
+
+  <meta name="google-site-verification" content="VhaciMaca92rdlXRrqBBFXCR1hxERcyhW4Kqq7XafWM" />
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Thomas' Blog Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="icon" href="/assets/images/thomas.jpg" type="image/jpeg" />
+
+<script type="application/ld+json">
+  
+
+  
+    {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "url": "https://thomas.preissler.me/blog/2022/01/10/implementing-a-timeline-with-scrolling-and-zooming-or-how-i-failed-at-elementary-school-math",
+  "name": "Implementing a timeline with scrolling and zooming - or how I failed at elementary school math",
+  "headline": "Implementing a timeline with scrolling and zooming - or how I failed at elementary school math",
+  "keywords": "",
+  "description": "I had to implement a timeline that can be scrolled and zoomed. I faced some challenges, but was doing quite well. Until I ran into some issues that took quite some time to work out. In the end, I failed measurably at some very basic elementary school math.",
+  "articleBody": "Recently I had the task of implementing a timeline. Not a big deal? You’re probably right, it’s just a bit of Flexbox magic. But there are three challenges:\n\n\n  The events in the timeline are not equally distributed and the space between the events need to follow that.\n  Since the timeline might contain a huge amount of events, a user needs to be able to zoom into the timeline.\n  If the full timeline is not visible anymore, the user needs to be able to scroll left and right by grabbing the timeline.\n\n\nI’ll omit any labels or fancy details and focus on the main challenges only.\n\n\n  Fully working example\n  Easy Peasy - the Flexbox magic\n  Scrolling\n  Zooming first attempt\n  Fix the calculations\n\n\nFully working example\n\nFirst, let’s take a look at the fully working example. It will give a better impression of the solution than the dry list of requirements.\n\nUse the mouse wheel to scroll in and out. Grab the timeline to move it left and right.\n\n\n\nIt’s implemented with pure HTML, CSS and JavaScript without a single dependency. 😇\n\nYou can find the full source code on Github.\n\nEasy Peasy - the Flexbox magic\n\nLet’s get started: A simple timeline requires only very few lines of CSS. It fills the whole screen and rescales well for different screen sizes. It employs a simple Flexbox layout with a flex-direction: row to keep the events in a row. But the events should not be distributed evenly, the space between them should differ and be customizable.\n\nThanks to Flexbox it’s quite simple: Just put a div between the events that has a flex-grow property. A div with flex-grow: 8 will get four times the space of a flex-grow: 2. The browser will then scale the size between the events accordingly to the flex-grow property. To put this abstract property to the timeline we can assume that the number of days between two events is set to the flex-grow property, e. g. if two events are 30 days apart, we would use flex-grow: 30. Easy peasy, right? I cannot image how painful an implemention would look like without the power of Flexbox.\n\nThe result looks quite good. And yet, it wasn’t a challenge to make it happen. So far, there is no reason for a longish blog post like this. But the task will get much harder in the next section. Be warned!\n\nFor now the scrollable and zoomable classes are needless, but they will get important very soon. I want to drop the full HTML and CSS here so that I don’t need to paste it later on again.\n\n&lt;div class=\"scrollable\"&gt;\n  &lt;div class=\"timeline zoomable\"&gt;\n    &lt;div class=\"spacer\" style=\"width: 26px;\"&gt;&lt;/div&gt;\n    &lt;div class=\"event\"&gt;&lt;/div&gt;\n    &lt;div class=\"spacer\" style=\"flex-grow: 1;\"&gt;&lt;/div&gt;\n    &lt;div class=\"event\"&gt;&lt;/div&gt;\n    &lt;div class=\"spacer\" style=\"flex-grow: 2;\"&gt;&lt;/div&gt;\n    &lt;div class=\"event\"&gt;&lt;/div&gt;\n    &lt;div class=\"spacer\" style=\"flex-grow: 3;\"&gt;&lt;/div&gt;\n    &lt;div class=\"event\"&gt;&lt;/div&gt;\n    &lt;div class=\"spacer\" style=\"flex-grow: 5;\"&gt;&lt;/div&gt;\n    &lt;div class=\"event\"&gt;&lt;/div&gt;\n    &lt;div class=\"spacer\" style=\"flex-grow: 8;\"&gt;&lt;/div&gt;\n    &lt;div class=\"event\"&gt;&lt;/div&gt;\n    &lt;div class=\"spacer\" style=\"width: 26px;\"&gt;&lt;/div&gt;\n  &lt;/div&gt;\n&lt;/div&gt;\n\n\n.scrollable {\n  overflow-x: hidden;\n  width: 100%;\n}\n\n.timeline {\n  display: flex;\n  flex-direction: row;\n  align-items: center;\n  height: 104px;\n  background-color: #f2f3f3;\n}\n\n.event {\n  width: 26px;\n  height: 26px;\n  border-radius: 100%;\n  background-color: rgb(0, 127, 255);\n}\n\n.spacer {\n  height: 6px;\n  background-color: rgba(0, 127, 255, 0.5);\n}\n\n\nScrolling\n\nScrolling consists of multiple features:\n\n  change the mouse point to grabbing when pressing the mouse button and back to grab when releasing it\n  save the mouse position whe pressing the mouse button\n  move the timeline accordingly to the left or right when the mouse is moved and the button is pressed\n\n\nThe latter feature is implemented by the scrollLeft property of the container. Every div has a scrollLeft property which is set to 0 by default. If the content of the container is wider than the container itself, the scrollLeft property can be used to drag the content to left so that the wider content can be capped on the left side.\n\nAn example: The visible container is 350 px wide and overflow-x is set to hidden. It contains an element with double width, i. e. 700 px. Without further specification, the browser would set the child element left-aligned with the visible container and cut off the right half. But with the help of the scrollLeft property the too wide child element can be dragged to the left, so that an arbitrary section can become visible. To show the center and cut off the same amount on both sides, scrollLeft would have to be set to 175 px in this example.\n\n\n\nSince there is no way to ask the browser if a user has the mouse button pressed right now, we need to listen to the mousedown and mouseup events and to remember the state manually. In addition when the mousedown event fires, we save the current position of the mouse pointer and the current scrollLeft position as initial values. We need those values later on to calculate the mouse distance.\n\nActually, it’s quite simple to implement that. The full source code can be viewed on Github, I’ll walk through some major steps.\n\nmousedown\n\nWhen the mouse button gets pressed, the current mouse position and the current scrollLeft value needs to be stored. In addition, the cursor style is changed to grabbing.\n\nscrollableElement.addEventListener('mousedown', (mouseEvent) =&gt; {\n  mouseDown = true;\n  scrollableElement.style.cursor = 'grabbing';\n  initialGrabPosition = mouseEvent.clientX;\n  initialScrollPosition = scrollableElement.scrollLeft;\n});\n\n\nmouseup\n\nWhen the user releases the mouse button, the values that were changed in the mousedown event must be reset.\n\nscrollableElement.addEventListener('mouseup', () =&gt; {\n  mouseDown = false;\n  scrollableElement.style.cursor = 'grab';\n});\n\n\nmousemove\n\nWhen the user moves the mouse, a very few mathematical calculations are required. The distance between the starting point of grabbing action and the current position of the mouse pointer must be computed and the value for scrollLeft must be reduced by exactly the same value.\n\nscrollableElement.addEventListener('mousemove', (mouseEvent) =&gt; {\n  if (mouseDown) {\n    const mouseMovementDistance = mouseEvent.clientX - initialGrabPosition;\n    scrollableElement.scrollLeft = initialScrollPosition - mouseMovementDistance;\n  }\n});\n\n\nThat’s it. Now the user can move the timeline left and right if it doesn’t fit on the screen. By default, the timeline is exactly as wide as the window, so the next task will be to implement the zoom behavior to actually use the scrolling feature.\n\nZooming - first attempt\n\nThe first challenge will be a draft implementation of the zooming feature. Spoiler: it won’t work as excepted and it took me ages to figure out whats going wrong.\n\nThe idea of the zoom function is to enlarge the timeline beyond the visible width by using the width property and set it to more than 100 % for the timeline itself and overflow-x: hidden for the its parent. The result is a timeline that is larger than the visible screen, but cropped to the original size. The spacing between events is doubled, so it feels like the timeline has been zoomed in.\n\nIf the width of the child element changes, it gets stretched to the right and therefore cropped on the right. To change the focus, the scrollLeft property needs to be changed accordingly.\n\nMy first attempt was to calculate the scrollLeft property according to the mouse position. If the mouse pointer is between the third and the fourth quarter and the user zooms in, the mouse pointer has to stay on that point. So the user has to move the timeline in such a way that the he gets the impression of thetimeline moving around his mouse pointer. It looks like he zoomed in at that exact spot. My first (and incorrect) assumption was to simply calculate the space difference and increase the scrollLeft property to match the mouse position accordingly.\n\nAn example: The timeline has a width of 100 px, we zoom in to make the timeline 200 px wide, so it has doubled in size. The mouse pointer is positioned between the third and fourth quarter, where it must be positioned also after zooming.\n\n\n\nscrollLeft must be computed in such a way that 75 % of the timeline is still on the left of the mouse pointer after zooming. In this example scrollLeft is increased by 100 px * 0.75, so it gets the value 263.\n\n\n\nLooks simple? Yes, it actually is. But …\n\nDoes it work?\n\nLet’s look again at the example of the timeline, which is zoomed in by the factor 2. This time, however, the example timeline will be in a more detailed way, representing the events and spaces between them.\n\n\n\nThe mouse pointer is again positioned at three-quarters, which in this example is at the end of the last element.\n\nIn the next step, the user zooms into the timeline so that the width increases to twice the original width.The algorithm is applied and the mouse pointer is moved back to its original position. Before and after zooming, the mouse pointer is over a point that is about three quarters wide.\n\n\n\nThe result is as expected. Or is it? The mouse pointer has the correct position relative to the timeline itself, but the mouse pointer is far away from the last element and no longer right next to it. To the user, it no longer seems as if the center of the zooming is below the mouse pointer. But that is exactly the expected behavior.\n\nWhat should it look like properly?\n\n\n\nIt is clear to see that the timeline is pushed significantly further to the right than the algorithm did. As can be seen, the scrollLeft property must be only roughly half the size. Where is the difference compared to the first simple example?\n\nWell, … The timeline consists of variable spacing between the points and the points themselves with fixed width. When the user scales the timeline, the spaces are changed, but the events are not.\n\nSimple example:\nAssume a Timeline which consists on the left half of 2 points with one length unit each, in addition there are 2 spaces with two length units each. In total, the left half of this imaginary Timeline is 6 length units (2*1 + 2*2).\nThe right half consists of only one distance with 6 length units.\n\n\n\nIf the user increases the timeline by a factor of two, all spacings get doubled, but not the events. On the left side the resulting size is 10 (2*1 + 2*4), whereas on the right half the distance doubles to 12. Thus the center of the timeline has shifted.\n\n\n\nFor single elements like an image the simple algorithm works well. Even if all elements scale the same, it works. But the timeline consists of the variable spacing between the points and the points with fixed widths. The effect is that the timeline does not scale proportionally.\n\nThis finding took me several days (and sleepless nights). In the end, the problem was simply some elementary school math.\n\nFix the calculations\n\nThe idea of the algorithm was quite correct. The timeline must be moved so that the event under the mouse pointer is fixed. The only difference is that this point not point of the timeline as a whole, but a child element of the timeline.\n\nFirst, it needs to be identified at which event or space the mouse pointer is located and relative to that element the original algorithm can be applied. In the example from above, the last point of the timeline is identified as the element below the mouse pointer. Relative to this element, the mouse pointer is at the very end. And it is exactly this position that we would have to reach again after zooming.\n\nThis sounds quite simple, but for the calculation of the scrollLeft property there are some additional information required. The position of the mouse pointer is measured from the edge of the screen. To compute the correct value the algorithm also needs all other relevant values in relation to the edge of the screen. This includes the distance of the timeline, its parent container as well as the the child element within the timeline where the mouse pointer is positioned.\n\nThe code for this looks like this:\n\nconst mousePosition = wheelEvent.clientX;\nconst elementUnderMouseLeft = getLeft(elementUnderMouse);\nconst zoomableLeft = getLeft(zoomableElement);\nconst containerLeft = getLeft(containerElement);\nconst moveAfterZoom = getWidth(elementUnderMouse) * mousePositionRelative;\n\ncontainerElement.scrollLeft =\n  elementUnderMouseLeft\n  - zoomableLeft\n  - mousePosition\n  + containerLeft\n  + moveAfterZoom;\n\n\nYou can find the full source of the zooming feature code on Github.\n\nComments are welcome on Twitter or LinkedIn.\n",
+  "datePublished": "2022-01-10 20:18:32 +0000",
+  "dateModified": "2022-01-10 20:18:32 +0000",
+  "author": {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Thomas Preißler",
+  "givenName": "Thomas",
+  "familyName": "Preißler",
+  "gender": "Male",
+  "email": "thomas@preissler.me",
+  "jobTitle": "Software Engineer",
+  "nationality": "Germany",
+  "url": "https://thomas.preissler.me",
+  "image": "https://thomas.preissler.me/assets/images/thomas.jpg",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Freiburg im Breisgau",
+    "addressCountry": "Germany"
+  },
+  "worksFor": [
+    {
+      "@type": "Organization",
+      "name": "NTT DATA DACH",
+      "sameAs": [
+        "https://de.nttdata.com/"
+      ]
+    }
+  ],
+  "alumniOf": [
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "TU Wien",
+      "sameAs": "https://www.tuwien.at/"
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "Staffordshire University",
+      "sameAs": "https://www.staffs.ac.uk/"
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "Technische Hochschule Rosenheim",
+      "sameAs": "https://www.th-rosenheim.de"
+    }
+  ],
+  "sameAs": [
+    "https://twitter.com/TheThomasPr",
+    "https://github.com/ThomasPr",
+    "https://stackoverflow.com/users/915955/thomas-prei%c3%9fler",
+    "https://www.xing.com/profile/Thomas_Preissler",
+    "https://www.linkedin.com/in/thomas-preissler"
+  ]
+}
+,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://thomas.preissler.me/blog/2022/01/10/implementing-a-timeline-with-scrolling-and-zooming-or-how-i-failed-at-elementary-school-math"
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://thomas.preissler.me/assets/images/2022-01-10/timeline-scrolling-zooming-og.png"
+  }
+}
+
+  
+</script>
+
+
+  </head>
+
+  <body class="layout--single wide">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          Thomas' Blog
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/">Blog</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about">About</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person">
+
+  
+    <div class="author__avatar">
+      
+        <img src="/assets/images/thomas.jpg" alt="Thomas Preißler" itemprop="image">
+      
+    </div>
+  
+
+  <div class="author__content">
+    
+      <h3 class="author__name" itemprop="name">Thomas Preißler</h3>
+    
+    
+      <div class="author__bio" itemprop="description">
+        <p>software developer,<br />addicted to KISS</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Freiburg, Germany</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="mailto:thomas@preissler.me" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-envelope" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/TheThomasPr" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/ThomasPr" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://stackoverflow.com/users/915955/thomas-prei%c3%9fler" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i><span class="label">Stack Overflow</span></a></li>
+          
+        
+          
+            <li><a href="https://www.xing.com/profile/Thomas_Preissler" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-xing" aria-hidden="true"></i><span class="label">Xing</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/thomas-preissler" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+
+  
+  </div>
+
+
+
+  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Implementing a timeline with scrolling and zooming - or how I failed at elementary school math">
+    <meta itemprop="description" content="I had to implement a timeline that can be scrolled and zoomed. I faced some challenges, but was doing quite well. Until I ran into some issues that took quite some time to work out. In the end, I failed measurably at some very basic elementary school math.">
+    <meta itemprop="datePublished" content="2022-01-10T20:18:32+00:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title" itemprop="headline">Implementing a timeline with scrolling and zooming - or how I failed at elementary school math
+</h1>
+          
+
+
+        </header>
+      
+
+      <section class="page__content" itemprop="text">
+        
+        <p>Recently I had the task of implementing a timeline. Not a big deal? You’re probably right, it’s just a bit of Flexbox magic. But there are three challenges:</p>
+
+<ul>
+  <li>The events in the timeline are not equally distributed and the space between the events need to follow that.</li>
+  <li>Since the timeline might contain a huge amount of events, a user needs to be able to zoom into the timeline.</li>
+  <li>If the full timeline is not visible anymore, the user needs to be able to scroll left and right by grabbing the timeline.</li>
+</ul>
+
+<p>I’ll omit any labels or fancy details and focus on the main challenges only.</p>
+
+<ol>
+  <li><a href="#fully-working-example">Fully working example</a></li>
+  <li><a href="#easy-peasy-the-flexbox-magic">Easy Peasy - the Flexbox magic</a></li>
+  <li><a href="#scrolling">Scrolling</a></li>
+  <li><a href="#zooming-first-attempt">Zooming first attempt</a></li>
+  <li><a href="#fix-the-calculations">Fix the calculations</a></li>
+</ol>
+
+<h2 id="fully-working-example">Fully working example</h2>
+
+<p>First, let’s take a look at the fully working example. It will give a better impression of the solution than the dry list of requirements.</p>
+
+<p>Use the mouse wheel to scroll in and out. Grab the timeline to move it left and right.</p>
+
+<iframe src="https://thomas.preissler.me/timeline/" width="100%" style="border: 0; height: 104px; margin-bottom: 1.3rem;"></iframe>
+
+<p>It’s implemented with pure HTML, CSS and JavaScript without a single dependency. 😇</p>
+
+<p>You can find the full source code on <a href="https://github.com/ThomasPr/timeline">Github</a>.</p>
+
+<h2 id="easy-peasy-the-flexbox-magic">Easy Peasy - the Flexbox magic</h2>
+
+<p>Let’s get started: A simple timeline requires only very few lines of CSS. It fills the whole screen and rescales well for different screen sizes. It employs a simple Flexbox layout with a <code class="language-plaintext highlighter-rouge">flex-direction: row</code> to keep the events in a row. But the events should not be distributed evenly, the space between them should differ and be customizable.</p>
+
+<p>Thanks to Flexbox it’s quite simple: Just put a <code class="language-plaintext highlighter-rouge">div</code> between the events that has a <code class="language-plaintext highlighter-rouge">flex-grow</code> property. A <code class="language-plaintext highlighter-rouge">div</code> with <code class="language-plaintext highlighter-rouge">flex-grow: 8</code> will get four times the space of a <code class="language-plaintext highlighter-rouge">flex-grow: 2</code>. The browser will then scale the size between the events accordingly to the <code class="language-plaintext highlighter-rouge">flex-grow</code> property. To put this abstract property to the timeline we can assume that the number of days between two events is set to the <code class="language-plaintext highlighter-rouge">flex-grow</code> property, e. g. if two events are 30 days apart, we would use <code class="language-plaintext highlighter-rouge">flex-grow: 30</code>. Easy peasy, right? I cannot image how painful an implemention would look like without the power of Flexbox.</p>
+
+<p>The result looks quite good. And yet, it wasn’t a challenge to make it happen. So far, there is no reason for a longish blog post like this. But the task will get much harder in the next section. Be warned!</p>
+
+<p>For now the <code class="language-plaintext highlighter-rouge">scrollable</code> and <code class="language-plaintext highlighter-rouge">zoomable</code> classes are needless, but they will get important very soon. I want to drop the full HTML and CSS here so that I don’t need to paste it later on again.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"scrollable"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"timeline zoomable"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"spacer"</span> <span class="na">style=</span><span class="s">"width: 26px;"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"event"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"spacer"</span> <span class="na">style=</span><span class="s">"flex-grow: 1;"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"event"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"spacer"</span> <span class="na">style=</span><span class="s">"flex-grow: 2;"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"event"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"spacer"</span> <span class="na">style=</span><span class="s">"flex-grow: 3;"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"event"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"spacer"</span> <span class="na">style=</span><span class="s">"flex-grow: 5;"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"event"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"spacer"</span> <span class="na">style=</span><span class="s">"flex-grow: 8;"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"event"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"spacer"</span> <span class="na">style=</span><span class="s">"width: 26px;"</span><span class="nt">&gt;&lt;/div&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</code></pre></div></div>
+
+<div class="language-css highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">.scrollable</span> <span class="p">{</span>
+  <span class="nl">overflow-x</span><span class="p">:</span> <span class="nb">hidden</span><span class="p">;</span>
+  <span class="nl">width</span><span class="p">:</span> <span class="m">100%</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.timeline</span> <span class="p">{</span>
+  <span class="nl">display</span><span class="p">:</span> <span class="n">flex</span><span class="p">;</span>
+  <span class="nl">flex-direction</span><span class="p">:</span> <span class="n">row</span><span class="p">;</span>
+  <span class="nl">align-items</span><span class="p">:</span> <span class="nb">center</span><span class="p">;</span>
+  <span class="nl">height</span><span class="p">:</span> <span class="m">104px</span><span class="p">;</span>
+  <span class="nl">background-color</span><span class="p">:</span> <span class="m">#f2f3f3</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nc">.event</span> <span class="p">{</span>
+  <span class="nl">width</span><span class="p">:</span> <span class="m">26px</span><span class="p">;</span>
+  <span class="nl">height</span><span class="p">:</span> <span class="m">26px</span><span class="p">;</span>
+  <span class="nl">border-radius</span><span class="p">:</span> <span class="m">100%</span><span class="p">;</span>
+  <span class="nl">background-color</span><span class="p">:</span> <span class="nb">rgb</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">127</span><span class="p">,</span> <span class="m">255</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nc">.spacer</span> <span class="p">{</span>
+  <span class="nl">height</span><span class="p">:</span> <span class="m">6px</span><span class="p">;</span>
+  <span class="nl">background-color</span><span class="p">:</span> <span class="n">rgba</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">127</span><span class="p">,</span> <span class="m">255</span><span class="p">,</span> <span class="m">0.5</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="scrolling">Scrolling</h2>
+
+<p>Scrolling consists of multiple features:</p>
+<ul>
+  <li>change the mouse point to <code class="language-plaintext highlighter-rouge">grabbing</code> when pressing the mouse button and back to <code class="language-plaintext highlighter-rouge">grab</code> when releasing it</li>
+  <li>save the mouse position whe pressing the mouse button</li>
+  <li>move the timeline accordingly to the left or right when the mouse is moved and the button is pressed</li>
+</ul>
+
+<p>The latter feature is implemented by the <code class="language-plaintext highlighter-rouge">scrollLeft</code> property of the container. Every <code class="language-plaintext highlighter-rouge">div</code> has a <code class="language-plaintext highlighter-rouge">scrollLeft</code> property which is set to 0 by default. If the content of the container is wider than the container itself, the <code class="language-plaintext highlighter-rouge">scrollLeft</code> property can be used to drag the content to left so that the wider content can be capped on the left side.</p>
+
+<p>An example: The visible container is 350 px wide and <code class="language-plaintext highlighter-rouge">overflow-x</code> is set to <code class="language-plaintext highlighter-rouge">hidden</code>. It contains an element with double width, i. e. 700 px. Without further specification, the browser would set the child element left-aligned with the visible container and cut off the right half. But with the help of the <code class="language-plaintext highlighter-rouge">scrollLeft</code> property the too wide child element can be dragged to the left, so that an arbitrary section can become visible. To show the center and cut off the same amount on both sides, <code class="language-plaintext highlighter-rouge">scrollLeft</code> would have to be set to 175 px in this example.</p>
+
+<p><img src="/assets/images/2022-01-10/scrollLeft.svg" alt="Explaining the scrollLeft property" /></p>
+
+<p>Since there is no way to ask the browser if a user has the mouse button pressed right now, we need to listen to the <code class="language-plaintext highlighter-rouge">mousedown</code> and <code class="language-plaintext highlighter-rouge">mouseup</code> events and to remember the state manually. In addition when the <code class="language-plaintext highlighter-rouge">mousedown</code> event fires, we save the current position of the mouse pointer and the current <code class="language-plaintext highlighter-rouge">scrollLeft</code> position as initial values. We need those values later on to calculate the mouse distance.</p>
+
+<p>Actually, it’s quite simple to implement that. The full source code can be viewed on <a href="https://github.com/ThomasPr/timeline/blob/main/scrollable.js">Github</a>, I’ll walk through some major steps.</p>
+
+<h3 id="mousedown">mousedown</h3>
+
+<p>When the mouse button gets pressed, the current mouse position and the current <code class="language-plaintext highlighter-rouge">scrollLeft</code> value needs to be stored. In addition, the cursor style is changed to <code class="language-plaintext highlighter-rouge">grabbing</code>.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">scrollableElement</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">mousedown</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">mouseEvent</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">mouseDown</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+  <span class="nx">scrollableElement</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">cursor</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">grabbing</span><span class="dl">'</span><span class="p">;</span>
+  <span class="nx">initialGrabPosition</span> <span class="o">=</span> <span class="nx">mouseEvent</span><span class="p">.</span><span class="nx">clientX</span><span class="p">;</span>
+  <span class="nx">initialScrollPosition</span> <span class="o">=</span> <span class="nx">scrollableElement</span><span class="p">.</span><span class="nx">scrollLeft</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<h3 id="mouseup">mouseup</h3>
+
+<p>When the user releases the mouse button, the values that were changed in the <code class="language-plaintext highlighter-rouge">mousedown</code> event must be reset.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">scrollableElement</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">mouseup</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="nx">mouseDown</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+  <span class="nx">scrollableElement</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">cursor</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">grab</span><span class="dl">'</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<h3 id="mousemove">mousemove</h3>
+
+<p>When the user moves the mouse, a very few mathematical calculations are required. The distance between the starting point of grabbing action and the current position of the mouse pointer must be computed and the value for <code class="language-plaintext highlighter-rouge">scrollLeft</code> must be reduced by exactly the same value.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">scrollableElement</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">mousemove</span><span class="dl">'</span><span class="p">,</span> <span class="p">(</span><span class="nx">mouseEvent</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">mouseDown</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">mouseMovementDistance</span> <span class="o">=</span> <span class="nx">mouseEvent</span><span class="p">.</span><span class="nx">clientX</span> <span class="o">-</span> <span class="nx">initialGrabPosition</span><span class="p">;</span>
+    <span class="nx">scrollableElement</span><span class="p">.</span><span class="nx">scrollLeft</span> <span class="o">=</span> <span class="nx">initialScrollPosition</span> <span class="o">-</span> <span class="nx">mouseMovementDistance</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>That’s it. Now the user can move the timeline left and right if it doesn’t fit on the screen. By default, the timeline is exactly as wide as the window, so the next task will be to implement the zoom behavior to actually use the scrolling feature.</p>
+
+<h2 id="zooming-first-attempt">Zooming - first attempt</h2>
+
+<p>The first challenge will be a draft implementation of the zooming feature. Spoiler: it won’t work as excepted and it took me ages to figure out whats going wrong.</p>
+
+<p>The idea of the zoom function is to enlarge the timeline beyond the visible width by using the <code class="language-plaintext highlighter-rouge">width</code> property and set it to more than 100 % for the timeline itself and <code class="language-plaintext highlighter-rouge">overflow-x: hidden</code> for the its parent. The result is a timeline that is larger than the visible screen, but cropped to the original size. The spacing between events is doubled, so it feels like the timeline has been zoomed in.</p>
+
+<p>If the width of the child element changes, it gets stretched to the right and therefore cropped on the right. To change the focus, the <code class="language-plaintext highlighter-rouge">scrollLeft</code> property needs to be changed accordingly.</p>
+
+<p>My first attempt was to calculate the <code class="language-plaintext highlighter-rouge">scrollLeft</code> property according to the mouse position. If the mouse pointer is between the third and the fourth quarter and the user zooms in, the mouse pointer has to stay on that point. So the user has to move the timeline in such a way that the he gets the impression of thetimeline moving around his mouse pointer. It looks like he zoomed in at that exact spot. My first (and incorrect) assumption was to simply calculate the space difference and increase the <code class="language-plaintext highlighter-rouge">scrollLeft</code> property to match the mouse position accordingly.</p>
+
+<p>An example: The timeline has a width of 100 px, we zoom in to make the timeline 200 px wide, so it has doubled in size. The mouse pointer is positioned between the third and fourth quarter, where it must be positioned also after zooming.</p>
+
+<p><img src="/assets/images/2022-01-10/zooming-simple-before.svg" alt="View of the Timeline before zooming" /></p>
+
+<p><code class="language-plaintext highlighter-rouge">scrollLeft</code> must be computed in such a way that 75 % of the timeline is still on the left of the mouse pointer after zooming. In this example <code class="language-plaintext highlighter-rouge">scrollLeft</code> is increased by 100 px * 0.75, so it gets the value 263.</p>
+
+<p><img src="/assets/images/2022-01-10/zooming-simple-after.svg" alt="View of the Timeline after zooming" /></p>
+
+<p>Looks simple? Yes, it actually is. But …</p>
+
+<h2 id="does-it-work">Does it work?</h2>
+
+<p>Let’s look again at the example of the timeline, which is zoomed in by the factor 2. This time, however, the example timeline will be in a more detailed way, representing the events and spaces between them.</p>
+
+<p><img src="/assets/images/2022-01-10/zooming-timeline-before.svg" alt="View of the Timeline before zooming" /></p>
+
+<p>The mouse pointer is again positioned at three-quarters, which in this example is at the end of the last element.</p>
+
+<p>In the next step, the user zooms into the timeline so that the width increases to twice the original width.The algorithm is applied and the mouse pointer is moved back to its original position. Before and after zooming, the mouse pointer is over a point that is about three quarters wide.</p>
+
+<p><img src="/assets/images/2022-01-10/zooming-timeline-after.svg" alt="View of the Timeline after zooming" /></p>
+
+<p>The result is as expected. Or is it? The mouse pointer has the correct position relative to the timeline itself, but the mouse pointer is far away from the last element and no longer right next to it. To the user, it no longer seems as if the center of the zooming is below the mouse pointer. But that is exactly the expected behavior.</p>
+
+<p>What should it look like properly?</p>
+
+<p><img src="/assets/images/2022-01-10/expected-timeline-movement.svg" alt="Expected Timeline movement" /></p>
+
+<p>It is clear to see that the timeline is pushed significantly further to the right than the algorithm did. As can be seen, the <code class="language-plaintext highlighter-rouge">scrollLeft</code> property must be only roughly half the size. Where is the difference compared to the first simple example?</p>
+
+<p>Well, … The timeline consists of variable spacing between the points and the points themselves with fixed width. When the user scales the timeline, the spaces are changed, but the events are not.</p>
+
+<p>Simple example:
+Assume a Timeline which consists on the left half of 2 points with one length unit each, in addition there are 2 spaces with two length units each. In total, the left half of this imaginary Timeline is 6 length units (2*1 + 2*2).
+The right half consists of only one distance with 6 length units.</p>
+
+<p><img src="/assets/images/2022-01-10/example1.svg" alt="before zooming" /></p>
+
+<p>If the user increases the timeline by a factor of two, all spacings get doubled, but not the events. On the left side the resulting size is 10 (2*1 + 2*4), whereas on the right half the distance doubles to 12. Thus the center of the timeline has shifted.</p>
+
+<p><img src="/assets/images/2022-01-10/example2.svg" alt="before zooming" /></p>
+
+<p>For single elements like an image the simple algorithm works well. Even if all elements scale the same, it works. But the timeline consists of the variable spacing between the points and the points with fixed widths. The effect is that the timeline does not scale proportionally.</p>
+
+<p>This finding took me several days (and sleepless nights). In the end, the problem was simply some elementary school math.</p>
+
+<h2 id="fix-the-calculations">Fix the calculations</h2>
+
+<p>The idea of the algorithm was quite correct. The timeline must be moved so that the event under the mouse pointer is fixed. The only difference is that this point not point of the timeline as a whole, but a child element of the timeline.</p>
+
+<p>First, it needs to be identified at which event or space the mouse pointer is located and relative to that element the original algorithm can be applied. In the example from above, the last point of the timeline is identified as the element below the mouse pointer. Relative to this element, the mouse pointer is at the very end. And it is exactly this position that we would have to reach again after zooming.</p>
+
+<p>This sounds quite simple, but for the calculation of the <code class="language-plaintext highlighter-rouge">scrollLeft</code> property there are some additional information required. The position of the mouse pointer is measured from the edge of the screen. To compute the correct value the algorithm also needs all other relevant values in relation to the edge of the screen. This includes the distance of the timeline, its parent container as well as the the child element within the timeline where the mouse pointer is positioned.</p>
+
+<p>The code for this looks like this:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">mousePosition</span> <span class="o">=</span> <span class="nx">wheelEvent</span><span class="p">.</span><span class="nx">clientX</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">elementUnderMouseLeft</span> <span class="o">=</span> <span class="nx">getLeft</span><span class="p">(</span><span class="nx">elementUnderMouse</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">zoomableLeft</span> <span class="o">=</span> <span class="nx">getLeft</span><span class="p">(</span><span class="nx">zoomableElement</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">containerLeft</span> <span class="o">=</span> <span class="nx">getLeft</span><span class="p">(</span><span class="nx">containerElement</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">moveAfterZoom</span> <span class="o">=</span> <span class="nx">getWidth</span><span class="p">(</span><span class="nx">elementUnderMouse</span><span class="p">)</span> <span class="o">*</span> <span class="nx">mousePositionRelative</span><span class="p">;</span>
+
+<span class="nx">containerElement</span><span class="p">.</span><span class="nx">scrollLeft</span> <span class="o">=</span>
+  <span class="nx">elementUnderMouseLeft</span>
+  <span class="o">-</span> <span class="nx">zoomableLeft</span>
+  <span class="o">-</span> <span class="nx">mousePosition</span>
+  <span class="o">+</span> <span class="nx">containerLeft</span>
+  <span class="o">+</span> <span class="nx">moveAfterZoom</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>You can find the full source of the zooming feature code on <a href="https://github.com/ThomasPr/timeline/blob/main/scrollable.js">Github</a>.</p>
+
+<p>Comments are welcome on Twitter or LinkedIn.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2022-01-10T20:18:32+00:00">January 10, 2022</time></p>
+
+
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://github.com/ThomasPr/ThomasPr.github.io" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 Thomas' Blog. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>

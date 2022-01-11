@@ -1,4 +1,226 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://thomas.preissler.me/feed.xml" rel="self" type="application/atom+xml" /><link href="https://thomas.preissler.me/" rel="alternate" type="text/html" /><updated>2021-10-23T20:05:29+00:00</updated><id>https://thomas.preissler.me/feed.xml</id><title type="html">Thomas’ Blog</title><subtitle>My personal thoughts on technology and oddities.</subtitle><author><name>Thomas Preißler</name></author><entry><title type="html">Release memory back to the OS with Java 11</title><link href="https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11" rel="alternate" type="text/html" title="Release memory back to the OS with Java 11" /><published>2021-05-02T14:19:03+00:00</published><updated>2021-05-02T14:19:03+00:00</updated><id>https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11</id><content type="html" xml:base="https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11">&lt;p&gt;I’m responsible for a Java application running in OpenShift. This application has to process a huge amount of data occassionally, but most of the time the application idles and waits for new input.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://thomas.preissler.me/feed.xml" rel="self" type="application/atom+xml" /><link href="https://thomas.preissler.me/" rel="alternate" type="text/html" /><updated>2022-01-11T22:43:43+00:00</updated><id>https://thomas.preissler.me/feed.xml</id><title type="html">Thomas’ Blog</title><subtitle>My personal thoughts on technology and oddities.</subtitle><author><name>Thomas Preißler</name></author><entry><title type="html">Implementing a timeline with scrolling and zooming - or how I failed at elementary school math</title><link href="https://thomas.preissler.me/blog/2022/01/10/implementing-a-timeline-with-scrolling-and-zooming-or-how-i-failed-at-elementary-school-math" rel="alternate" type="text/html" title="Implementing a timeline with scrolling and zooming - or how I failed at elementary school math" /><published>2022-01-10T20:18:32+00:00</published><updated>2022-01-10T20:18:32+00:00</updated><id>https://thomas.preissler.me/blog/2022/01/10/implementing-a-timeline-with-scrolling-and-zooming-or-how-i-failed-at-elementary-school-math</id><content type="html" xml:base="https://thomas.preissler.me/blog/2022/01/10/implementing-a-timeline-with-scrolling-and-zooming-or-how-i-failed-at-elementary-school-math">&lt;p&gt;Recently I had the task of implementing a timeline. Not a big deal? You’re probably right, it’s just a bit of Flexbox magic. But there are three challenges:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;The events in the timeline are not equally distributed and the space between the events need to follow that.&lt;/li&gt;
+  &lt;li&gt;Since the timeline might contain a huge amount of events, a user needs to be able to zoom into the timeline.&lt;/li&gt;
+  &lt;li&gt;If the full timeline is not visible anymore, the user needs to be able to scroll left and right by grabbing the timeline.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I’ll omit any labels or fancy details and focus on the main challenges only.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;#fully-working-example&quot;&gt;Fully working example&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#easy-peasy-the-flexbox-magic&quot;&gt;Easy Peasy - the Flexbox magic&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#scrolling&quot;&gt;Scrolling&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#zooming-first-attempt&quot;&gt;Zooming first attempt&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#fix-the-calculations&quot;&gt;Fix the calculations&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;fully-working-example&quot;&gt;Fully working example&lt;/h2&gt;
+
+&lt;p&gt;First, let’s take a look at the fully working example. It will give a better impression of the solution than the dry list of requirements.&lt;/p&gt;
+
+&lt;p&gt;Use the mouse wheel to scroll in and out. Grab the timeline to move it left and right.&lt;/p&gt;
+
+&lt;iframe src=&quot;https://thomas.preissler.me/timeline/&quot; width=&quot;100%&quot; style=&quot;border: 0; height: 104px; margin-bottom: 1.3rem;&quot;&gt;&lt;/iframe&gt;
+
+&lt;p&gt;It’s implemented with pure HTML, CSS and JavaScript without a single dependency. 😇&lt;/p&gt;
+
+&lt;p&gt;You can find the full source code on &lt;a href=&quot;https://github.com/ThomasPr/timeline&quot;&gt;Github&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;easy-peasy-the-flexbox-magic&quot;&gt;Easy Peasy - the Flexbox magic&lt;/h2&gt;
+
+&lt;p&gt;Let’s get started: A simple timeline requires only very few lines of CSS. It fills the whole screen and rescales well for different screen sizes. It employs a simple Flexbox layout with a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;flex-direction: row&lt;/code&gt; to keep the events in a row. But the events should not be distributed evenly, the space between them should differ and be customizable.&lt;/p&gt;
+
+&lt;p&gt;Thanks to Flexbox it’s quite simple: Just put a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;div&lt;/code&gt; between the events that has a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;flex-grow&lt;/code&gt; property. A &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;div&lt;/code&gt; with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;flex-grow: 8&lt;/code&gt; will get four times the space of a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;flex-grow: 2&lt;/code&gt;. The browser will then scale the size between the events accordingly to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;flex-grow&lt;/code&gt; property. To put this abstract property to the timeline we can assume that the number of days between two events is set to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;flex-grow&lt;/code&gt; property, e. g. if two events are 30 days apart, we would use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;flex-grow: 30&lt;/code&gt;. Easy peasy, right? I cannot image how painful an implemention would look like without the power of Flexbox.&lt;/p&gt;
+
+&lt;p&gt;The result looks quite good. And yet, it wasn’t a challenge to make it happen. So far, there is no reason for a longish blog post like this. But the task will get much harder in the next section. Be warned!&lt;/p&gt;
+
+&lt;p&gt;For now the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollable&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;zoomable&lt;/code&gt; classes are needless, but they will get important very soon. I want to drop the full HTML and CSS here so that I don’t need to paste it later on again.&lt;/p&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;scrollable&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;timeline zoomable&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;spacer&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;style=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;width: 26px;&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;event&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;spacer&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;style=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;flex-grow: 1;&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;event&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;spacer&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;style=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;flex-grow: 2;&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;event&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;spacer&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;style=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;flex-grow: 3;&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;event&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;spacer&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;style=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;flex-grow: 5;&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;event&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;spacer&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;style=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;flex-grow: 8;&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;event&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;spacer&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;style=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;width: 26px;&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-css highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nc&quot;&gt;.scrollable&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;overflow-x&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;hidden&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nc&quot;&gt;.timeline&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;flex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;flex-direction&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;align-items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;104px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;#f2f3f3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nc&quot;&gt;.event&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;26px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;26px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;border-radius&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;rgb&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;127&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nc&quot;&gt;.spacer&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;height&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;6px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nl&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rgba&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;127&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;255&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;scrolling&quot;&gt;Scrolling&lt;/h2&gt;
+
+&lt;p&gt;Scrolling consists of multiple features:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;change the mouse point to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;grabbing&lt;/code&gt; when pressing the mouse button and back to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;grab&lt;/code&gt; when releasing it&lt;/li&gt;
+  &lt;li&gt;save the mouse position whe pressing the mouse button&lt;/li&gt;
+  &lt;li&gt;move the timeline accordingly to the left or right when the mouse is moved and the button is pressed&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The latter feature is implemented by the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; property of the container. Every &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;div&lt;/code&gt; has a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; property which is set to 0 by default. If the content of the container is wider than the container itself, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; property can be used to drag the content to left so that the wider content can be capped on the left side.&lt;/p&gt;
+
+&lt;p&gt;An example: The visible container is 350 px wide and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;overflow-x&lt;/code&gt; is set to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;hidden&lt;/code&gt;. It contains an element with double width, i. e. 700 px. Without further specification, the browser would set the child element left-aligned with the visible container and cut off the right half. But with the help of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; property the too wide child element can be dragged to the left, so that an arbitrary section can become visible. To show the center and cut off the same amount on both sides, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; would have to be set to 175 px in this example.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2022-01-10/scrollLeft.svg&quot; alt=&quot;Explaining the scrollLeft property&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Since there is no way to ask the browser if a user has the mouse button pressed right now, we need to listen to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mousedown&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mouseup&lt;/code&gt; events and to remember the state manually. In addition when the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mousedown&lt;/code&gt; event fires, we save the current position of the mouse pointer and the current &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; position as initial values. We need those values later on to calculate the mouse distance.&lt;/p&gt;
+
+&lt;p&gt;Actually, it’s quite simple to implement that. The full source code can be viewed on &lt;a href=&quot;https://github.com/ThomasPr/timeline/blob/main/scrollable.js&quot;&gt;Github&lt;/a&gt;, I’ll walk through some major steps.&lt;/p&gt;
+
+&lt;h3 id=&quot;mousedown&quot;&gt;mousedown&lt;/h3&gt;
+
+&lt;p&gt;When the mouse button gets pressed, the current mouse position and the current &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; value needs to be stored. In addition, the cursor style is changed to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;grabbing&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;scrollableElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;addEventListener&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;mousedown&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;mouseEvent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;mouseDown&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;scrollableElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;style&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cursor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;grabbing&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;initialGrabPosition&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;mouseEvent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;clientX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;initialScrollPosition&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;scrollableElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;scrollLeft&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;mouseup&quot;&gt;mouseup&lt;/h3&gt;
+
+&lt;p&gt;When the user releases the mouse button, the values that were changed in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mousedown&lt;/code&gt; event must be reset.&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;scrollableElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;addEventListener&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;mouseup&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;mouseDown&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;scrollableElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;style&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;cursor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;grab&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;mousemove&quot;&gt;mousemove&lt;/h3&gt;
+
+&lt;p&gt;When the user moves the mouse, a very few mathematical calculations are required. The distance between the starting point of grabbing action and the current position of the mouse pointer must be computed and the value for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; must be reduced by exactly the same value.&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;scrollableElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;addEventListener&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;mousemove&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;mouseEvent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;mouseDown&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;mouseMovementDistance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;mouseEvent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;clientX&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;initialGrabPosition&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;scrollableElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;scrollLeft&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;initialScrollPosition&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;mouseMovementDistance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;That’s it. Now the user can move the timeline left and right if it doesn’t fit on the screen. By default, the timeline is exactly as wide as the window, so the next task will be to implement the zoom behavior to actually use the scrolling feature.&lt;/p&gt;
+
+&lt;h2 id=&quot;zooming-first-attempt&quot;&gt;Zooming - first attempt&lt;/h2&gt;
+
+&lt;p&gt;The first challenge will be a draft implementation of the zooming feature. Spoiler: it won’t work as excepted and it took me ages to figure out whats going wrong.&lt;/p&gt;
+
+&lt;p&gt;The idea of the zoom function is to enlarge the timeline beyond the visible width by using the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;width&lt;/code&gt; property and set it to more than 100 % for the timeline itself and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;overflow-x: hidden&lt;/code&gt; for the its parent. The result is a timeline that is larger than the visible screen, but cropped to the original size. The spacing between events is doubled, so it feels like the timeline has been zoomed in.&lt;/p&gt;
+
+&lt;p&gt;If the width of the child element changes, it gets stretched to the right and therefore cropped on the right. To change the focus, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; property needs to be changed accordingly.&lt;/p&gt;
+
+&lt;p&gt;My first attempt was to calculate the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; property according to the mouse position. If the mouse pointer is between the third and the fourth quarter and the user zooms in, the mouse pointer has to stay on that point. So the user has to move the timeline in such a way that the he gets the impression of thetimeline moving around his mouse pointer. It looks like he zoomed in at that exact spot. My first (and incorrect) assumption was to simply calculate the space difference and increase the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; property to match the mouse position accordingly.&lt;/p&gt;
+
+&lt;p&gt;An example: The timeline has a width of 100 px, we zoom in to make the timeline 200 px wide, so it has doubled in size. The mouse pointer is positioned between the third and fourth quarter, where it must be positioned also after zooming.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2022-01-10/zooming-simple-before.svg&quot; alt=&quot;View of the Timeline before zooming&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; must be computed in such a way that 75 % of the timeline is still on the left of the mouse pointer after zooming. In this example &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; is increased by 100 px * 0.75, so it gets the value 263.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2022-01-10/zooming-simple-after.svg&quot; alt=&quot;View of the Timeline after zooming&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Looks simple? Yes, it actually is. But …&lt;/p&gt;
+
+&lt;h2 id=&quot;does-it-work&quot;&gt;Does it work?&lt;/h2&gt;
+
+&lt;p&gt;Let’s look again at the example of the timeline, which is zoomed in by the factor 2. This time, however, the example timeline will be in a more detailed way, representing the events and spaces between them.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2022-01-10/zooming-timeline-before.svg&quot; alt=&quot;View of the Timeline before zooming&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The mouse pointer is again positioned at three-quarters, which in this example is at the end of the last element.&lt;/p&gt;
+
+&lt;p&gt;In the next step, the user zooms into the timeline so that the width increases to twice the original width.The algorithm is applied and the mouse pointer is moved back to its original position. Before and after zooming, the mouse pointer is over a point that is about three quarters wide.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2022-01-10/zooming-timeline-after.svg&quot; alt=&quot;View of the Timeline after zooming&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The result is as expected. Or is it? The mouse pointer has the correct position relative to the timeline itself, but the mouse pointer is far away from the last element and no longer right next to it. To the user, it no longer seems as if the center of the zooming is below the mouse pointer. But that is exactly the expected behavior.&lt;/p&gt;
+
+&lt;p&gt;What should it look like properly?&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2022-01-10/expected-timeline-movement.svg&quot; alt=&quot;Expected Timeline movement&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It is clear to see that the timeline is pushed significantly further to the right than the algorithm did. As can be seen, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; property must be only roughly half the size. Where is the difference compared to the first simple example?&lt;/p&gt;
+
+&lt;p&gt;Well, … The timeline consists of variable spacing between the points and the points themselves with fixed width. When the user scales the timeline, the spaces are changed, but the events are not.&lt;/p&gt;
+
+&lt;p&gt;Simple example:
+Assume a Timeline which consists on the left half of 2 points with one length unit each, in addition there are 2 spaces with two length units each. In total, the left half of this imaginary Timeline is 6 length units (2*1 + 2*2).
+The right half consists of only one distance with 6 length units.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2022-01-10/example1.svg&quot; alt=&quot;before zooming&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If the user increases the timeline by a factor of two, all spacings get doubled, but not the events. On the left side the resulting size is 10 (2*1 + 2*4), whereas on the right half the distance doubles to 12. Thus the center of the timeline has shifted.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/2022-01-10/example2.svg&quot; alt=&quot;before zooming&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For single elements like an image the simple algorithm works well. Even if all elements scale the same, it works. But the timeline consists of the variable spacing between the points and the points with fixed widths. The effect is that the timeline does not scale proportionally.&lt;/p&gt;
+
+&lt;p&gt;This finding took me several days (and sleepless nights). In the end, the problem was simply some elementary school math.&lt;/p&gt;
+
+&lt;h2 id=&quot;fix-the-calculations&quot;&gt;Fix the calculations&lt;/h2&gt;
+
+&lt;p&gt;The idea of the algorithm was quite correct. The timeline must be moved so that the event under the mouse pointer is fixed. The only difference is that this point not point of the timeline as a whole, but a child element of the timeline.&lt;/p&gt;
+
+&lt;p&gt;First, it needs to be identified at which event or space the mouse pointer is located and relative to that element the original algorithm can be applied. In the example from above, the last point of the timeline is identified as the element below the mouse pointer. Relative to this element, the mouse pointer is at the very end. And it is exactly this position that we would have to reach again after zooming.&lt;/p&gt;
+
+&lt;p&gt;This sounds quite simple, but for the calculation of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scrollLeft&lt;/code&gt; property there are some additional information required. The position of the mouse pointer is measured from the edge of the screen. To compute the correct value the algorithm also needs all other relevant values in relation to the edge of the screen. This includes the distance of the timeline, its parent container as well as the the child element within the timeline where the mouse pointer is positioned.&lt;/p&gt;
+
+&lt;p&gt;The code for this looks like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;mousePosition&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;wheelEvent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;clientX&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;elementUnderMouseLeft&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;getLeft&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;elementUnderMouse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;zoomableLeft&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;getLeft&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;zoomableElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;containerLeft&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;getLeft&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;containerElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;moveAfterZoom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;getWidth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;elementUnderMouse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;mousePositionRelative&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;nx&quot;&gt;containerElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;scrollLeft&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
+  &lt;span class=&quot;nx&quot;&gt;elementUnderMouseLeft&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;zoomableLeft&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;mousePosition&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;containerLeft&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;moveAfterZoom&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You can find the full source of the zooming feature code on &lt;a href=&quot;https://github.com/ThomasPr/timeline/blob/main/scrollable.js&quot;&gt;Github&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Comments are welcome on Twitter or LinkedIn.&lt;/p&gt;</content><author><name>Thomas Preißler</name></author><category term="blog" /><summary type="html">I had to implement a timeline that can be scrolled and zoomed. I faced some challenges, but was doing quite well. Until I ran into some issues that took quite some time to work out. In the end, I failed measurably at some very basic elementary school math.</summary></entry><entry><title type="html">Release memory back to the OS with Java 11</title><link href="https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11" rel="alternate" type="text/html" title="Release memory back to the OS with Java 11" /><published>2021-05-02T14:19:03+00:00</published><updated>2021-05-02T14:19:03+00:00</updated><id>https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11</id><content type="html" xml:base="https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11">&lt;p&gt;I’m responsible for a Java application running in OpenShift. This application has to process a huge amount of data occassionally, but most of the time the application idles and waits for new input.&lt;/p&gt;
 
 &lt;p&gt;The application takes a huge amount of memory during processing the data. But when the processing job has been completed, the memory can be released and returned to the operating system. Unfortunately, this doesn’t happen. The JVM seems to keep the memory forever.&lt;/p&gt;
 
