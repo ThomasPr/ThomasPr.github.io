@@ -67,3 +67,5 @@ userList.stream()
 ```
 
 Filtering Java Streams can be very concise by using method references. To achieve the opposite of a provided method, Predicate.not is a handy solution.
+
+Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1348273079500333058).

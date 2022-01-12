@@ -142,3 +142,5 @@ The only required setting is to change the Source to the `gh-pages` branch. But 
 
 
 Thats it. The blog is up and running. Every time I push a change to my blog, the GitHub Action is triggered and the updated static HTML page is published.
+
+Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1343104333295058944) or [LinkedIn](https://www.linkedin.com/posts/thomas-preissler_build-my-jekyll-blog-with-bare-github-actions-activity-6857657838328696832-A5b7).

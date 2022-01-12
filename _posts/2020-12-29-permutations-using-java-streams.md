@@ -84,3 +84,5 @@ public final class CartesianProductUtil {
 ```
 
 The code is also available on this [GitHub Gist](https://gist.github.com/ThomasPr/8e038d5ebca97261940bf1dd13d3417d).
+
+Comments are welcome on [LinkedIn](https://www.linkedin.com/posts/thomas-preissler_build-a-cartesian-product-with-java-streams-activity-6857658482074669056-FiZH).

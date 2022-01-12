@@ -243,4 +243,4 @@ containerElement.scrollLeft =
 
 You can find the full source of the zooming feature code on [Github](https://github.com/ThomasPr/timeline/blob/main/scrollable.js).
 
-Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1481350578689167371) or [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:6887116328415596544/).
+Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1481350578689167371) or [LinkedIn](https://www.linkedin.com/posts/thomas-preissler_implementing-a-timeline-with-scrolling-and-activity-6887116328415596544-E2-y).

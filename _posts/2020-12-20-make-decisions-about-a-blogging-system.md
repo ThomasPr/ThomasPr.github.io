@@ -58,4 +58,5 @@ Check out my public repository on GitHub to see final result:
   - The [master](https://github.com/ThomasPr/ThomasPr.github.io/tree/master) branch contains the Jekyll content
   - The [gh-pages](https://github.com/ThomasPr/ThomasPr.github.io/tree/gh-pages) branch contains the generated static pages which are visible in the blog
 
+Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1340778103929524234) or [LinkedIn](https://www.linkedin.com/posts/thomas-preissler_make-decisions-about-a-blogging-system-activity-6857657519179931648-4RHN).
 

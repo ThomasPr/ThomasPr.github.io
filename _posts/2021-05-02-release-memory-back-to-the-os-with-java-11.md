@@ -46,6 +46,7 @@ java \
   -jar app.jar
 ```
 
+Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1388916641178718208) or [LinkedIn](https://www.linkedin.com/posts/thomas-preissler_release-memory-back-to-the-os-with-java-11-activity-6857659740864987136-oBwF).
 
 ## Links
 

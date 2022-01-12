@@ -229,3 +229,5 @@ If you read the code, do you prefer nested for-loops or streams?
 IMHO the nested for-loops can be understood more easily than streams. Therefore, I prefer the nested for-loops.
 
 Please keep in mind, that Java Streams is a powerful performance improvement when you have to deal with large data sets. But you need to take special attention on readability if you don't want to get a trade-off for your readers.
+
+Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1375360481205088256) or [LinkedIn](https://www.linkedin.com/posts/thomas-preissler_java-streams-are-not-always-a-good-fit-for-activity-6857659454754754560-IJmU).
