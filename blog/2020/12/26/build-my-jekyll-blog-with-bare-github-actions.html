@@ -42,6 +42,10 @@
 
 
 
+  
+
+  
+
 
 <link rel="canonical" href="https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions">
 
@@ -227,22 +231,22 @@
   
 
 
-<div itemscope itemtype="https://schema.org/Person">
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
 
   
     <div class="author__avatar">
-      
-        <img src="/assets/images/thomas.jpg" alt="Thomas Preißler" itemprop="image">
-      
+      <a href="https://thomas.preissler.me/">
+        <img src="/assets/images/thomas.jpg" alt="Thomas Preißler" itemprop="image" class="u-photo">
+      </a>
     </div>
   
 
   <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="https://thomas.preissler.me/" itemprop="url">Thomas Preißler</a>
+    </h3>
     
-      <h3 class="author__name" itemprop="name">Thomas Preißler</h3>
-    
-    
-      <div class="author__bio" itemprop="description">
+      <div class="author__bio p-note" itemprop="description">
         <p>software developer,<br />addicted to KISS</p>
 
       </div>
@@ -254,34 +258,34 @@
     <ul class="author__urls social-icons">
       
         <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
-          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name">Freiburg, Germany</span>
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">Freiburg, Germany</span>
         </li>
       
 
       
         
           
-            <li><a href="mailto:thomas@preissler.me" rel="nofollow noopener noreferrer"><i class="fas fa-fw fa-envelope" aria-hidden="true"></i><span class="label">Email</span></a></li>
+            <li><a href="mailto:thomas@preissler.me" rel="nofollow noopener noreferrer me"><i class="fas fa-fw fa-envelope" aria-hidden="true"></i><span class="label">Email</span></a></li>
           
         
           
-            <li><a href="https://twitter.com/TheThomasPr" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+            <li><a href="https://twitter.com/TheThomasPr" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
           
         
           
-            <li><a href="https://github.com/ThomasPr" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+            <li><a href="https://github.com/ThomasPr" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
           
         
           
-            <li><a href="https://stackoverflow.com/users/915955/thomas-prei%c3%9fler" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i><span class="label">Stack Overflow</span></a></li>
+            <li><a href="https://stackoverflow.com/users/915955/thomas-prei%c3%9fler" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i><span class="label">Stack Overflow</span></a></li>
           
         
           
-            <li><a href="https://www.xing.com/profile/Thomas_Preissler" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-xing" aria-hidden="true"></i><span class="label">Xing</span></a></li>
+            <li><a href="https://www.xing.com/profile/Thomas_Preissler" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-xing" aria-hidden="true"></i><span class="label">Xing</span></a></li>
           
         
           
-            <li><a href="https://www.linkedin.com/in/thomas-preissler" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+            <li><a href="https://www.linkedin.com/in/thomas-preissler" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
           
         
       
@@ -336,7 +340,7 @@
 
       <!--
   <li>
-    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer">
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
       <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
     </a>
   </li>
@@ -344,13 +348,12 @@
     </ul>
   </div>
 </div>
-
   
   </div>
 
 
 
-  <article class="page" itemscope itemtype="https://schema.org/CreativeWork">
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
     <meta itemprop="headline" content="Build my Jekyll blog with bare GitHub Actions">
     <meta itemprop="description" content="Use GitHub Actions without third-party marketplace Actions to build my Jekyll blog. Publish the generated content on GitHub Pages.">
     <meta itemprop="datePublished" content="2020-12-26T09:55:03+00:00">
@@ -359,15 +362,17 @@
     <div class="page__inner-wrap">
       
         <header>
-          <h1 id="page-title" class="page__title" itemprop="headline">Build my Jekyll blog with bare GitHub Actions
-</h1>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions" class="u-url" itemprop="url">Build my Jekyll blog with bare GitHub Actions
+</a>
+          </h1>
           
 
 
         </header>
       
 
-      <section class="page__content" itemprop="text">
+      <section class="page__content e-content" itemprop="text">
         
         <p>I use <a href="https://jekyllrb.com/">Jekyll</a> to create my blog. It allows me to focus on writing the content with markdown and afterwards to generate a static HTML page that can be published easily.</p>
 
@@ -502,10 +507,24 @@
         
 
 
+  
+
+
+  
+
+  <p class="page__taxonomy">
+    <strong><i class="fas fa-fw fa-folder-open" aria-hidden="true"></i> Categories: </strong>
+    <span itemprop="keywords">
+    
+      <a href="/categories/#blog" class="page__taxonomy-item p-category" rel="tag">blog</a>
+    
+    </span>
+  </p>
+
+
         
 
-  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time datetime="2020-12-26T09:55:03+00:00">December 26, 2020</time></p>
-
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time class="dt-published" datetime="2020-12-26T09:55:03+00:00">December 26, 2020</time></p>
 
       </footer>
 
@@ -520,7 +539,6 @@
   
   
 </div>
-
     </div>
 
     
@@ -548,7 +566,7 @@
   </ul>
 </div>
 
-<div class="page__footer-copyright">&copy; 2022 Thomas' Blog. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+<div class="page__footer-copyright">&copy; 2022 Your Name. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
 
       </footer>
     </div>
