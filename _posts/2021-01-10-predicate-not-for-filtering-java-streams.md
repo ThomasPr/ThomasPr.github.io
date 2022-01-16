@@ -1,7 +1,6 @@
 ---
 title:  "Predicate.not for filtering Java Streams"
 date:   2021-01-10 15:07:00 +0100
-categories: blog
 excerpt: "Predicate.not is handy to filter streams with method references for the opposite of a provided method"
 header:
   og_image: /assets/images/2021-01-10/filter.png

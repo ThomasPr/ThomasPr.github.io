@@ -1,7 +1,6 @@
 ---
 title:  "Build my Jekyll blog with bare GitHub Actions"
 date:   2020-12-26 10:55:03 +0100
-categories: blog
 excerpt: "Use GitHub Actions without third-party marketplace Actions to build my Jekyll blog. Publish the generated content on GitHub Pages."
 header:
   og_image: /assets/images/2020-12-26/github-action.png

@@ -1,7 +1,6 @@
 ---
 title:  "Make decisions about a blogging system"
 date:   2020-12-20 22:43:50 +0100
-categories: blog
 excerpt: "It was a challenging task to decide which software I want to use for this blog."
 ---
 

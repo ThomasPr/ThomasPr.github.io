@@ -1,7 +1,6 @@
 ---
 title:  "Java Streams are not always a good fit for readability"
 date:   2021-03-25 23:03:03 +0100
-categories: blog
 excerpt: "Java Streams are powerful but need to get special attention to keep the implementation readable."
 header:
   og_image: /assets/images/2021-03-25/streams.png

@@ -1,7 +1,6 @@
 ---
 title:  "Release memory back to the OS with Java 11"
 date:   2021-05-02 16:19:03 +0200
-categories: blog
 excerpt: "Java 11 is by default very reluctant to release unnecessary memory back to the operation system. The Shenandoah GC is more aggressive and available in Java 11."
 header:
   og_image: /assets/images/2021-05-02/os2.png

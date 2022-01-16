@@ -1,7 +1,6 @@
 ---
 title:  "Implementing a timeline with scrolling and zooming - or how I failed at elementary school math"
 date:   2022-01-10 22:18:32 +0200
-categories: blog
 excerpt: "I had to implement a timeline that can be scrolled and zoomed. I faced some challenges, but was doing quite well. Until I ran into some issues that took quite some time to work out. In the end, I failed measurably at some very basic elementary school math."
 header:
   og_image: /assets/images/2022-01-10/timeline-scrolling-zooming-og.png
