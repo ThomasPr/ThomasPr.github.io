@@ -19,6 +19,7 @@
 # in the templates via {{ site.myvariable }}.
 
 title: Thomas' Blog
+name: Thomas Preißler
 description: >- # this means to ignore newlines until "baseurl:"
   My personal thoughts on technology and oddities.
 baseurl: "" # the subpath of your site, e.g. /blog
@@ -67,6 +68,7 @@ defaults:
       layout: single
       classes: wide
       author_profile: true
+      show_date: true
 
 social:
   type: Person
@@ -77,6 +79,9 @@ social:
     - "https://stackoverflow.com/users/915955/thomas-prei%c3%9fler"
     - "https://www.xing.com/profile/Thomas_Preissler"
     - "https://www.linkedin.com/in/thomas-preissler/"
+
+twitter:
+  username: TheThomasPr
 
 footer:
   links:
