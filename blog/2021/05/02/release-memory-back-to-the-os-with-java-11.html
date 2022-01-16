@@ -34,6 +34,18 @@
 
 
 
+  <meta name="twitter:site" content="@TheThomasPr">
+  <meta name="twitter:title" content="Release memory back to the OS with Java 11">
+  <meta name="twitter:description" content="Java 11 is by default very reluctant to release unnecessary memory back to the operation system. The Shenandoah GC is more aggressive and available in Java 11.">
+  <meta name="twitter:url" content="https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11">
+
+  
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://thomas.preissler.me/assets/images/2021-05-02/os2.png">
+  
+
+  
+
 
 
   <meta property="article:published_time" content="2021-05-02T14:19:03+00:00">
@@ -93,90 +105,7 @@
 
 
 
-    <link rel="icon" href="/assets/images/thomas.jpg" type="image/jpeg" />
-
-<script type="application/ld+json">
-  
-
-  
-    {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "url": "https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11",
-  "name": "Release memory back to the OS with Java 11",
-  "headline": "Release memory back to the OS with Java 11",
-  "keywords": "",
-  "description": "Java 11 is by default very reluctant to release unnecessary memory back to the operation system. The Shenandoah GC is more aggressive and available in Java 11.",
-  "articleBody": "I’m responsible for a Java application running in OpenShift. This application has to process a huge amount of data occassionally, but most of the time the application idles and waits for new input.\n\nThe application takes a huge amount of memory during processing the data. But when the processing job has been completed, the memory can be released and returned to the operating system. Unfortunately, this doesn’t happen. The JVM seems to keep the memory forever.\n\n\n\nWhat’s going on?\n\n\n  Currently the G1 garbage collector may not return committed Java heap memory to the operating system in a timely manner. G1 only returns memory from the Java heap at either a full GC or during a concurrent cycle. Since G1 tries hard to completely avoid full GCs, and only triggers a concurrent cycle based on Java heap occupancy and allocation activity, it will not return Java heap memory in many cases unless forced to do so externally. – JEP 346\n\n\nThe motivation of JEP 346 describes perfectly what I observed from my application. When it should release memory, there’s no need anymore to run the garbage collector at all. Therefore, it will keep the memory until the next huge processing phase starts and requires the memory again.\n\nHow can this be fixed?\n\nJEP 346 has exactly this issue in mind: Promptly Return Unused Committed Memory from G1. JEP 346 has been implemented in Java 12. Unfortunately, I have to use Java 11 and cannot benefit from this improvment.\n\nBut there are other garbage collectors than the default G1. Ruslan Synytsky has a well-written blog post about the memory consumption of different garbage collectors.\n\nBased on his observations there’s a huge difference in the behaviour of the memory consumption. It seems that the Shenandoah GC might be a really good option for my application. Next to ZGC, Shenandoah is one of the newest garbage collectors and available as production ready in Java 15. But Shenandoah has been backported to OpenJDK 11 and is available since version 11.0.9. Therefore I’m able to use it. Let’s give it a try:\n\njava -XX:+UseShenandoahGC -jar app.jar\n\n\n\n\nIt works! As you can see, some time after finishing the hard processing work, Shenandoah returns most of the memory back to the operating system.\n\nSince reducing the heap is an expensive operation, Shenandoah takes a delay of 5 minutes (300,000 ms) by default to release any memory back to the operating system. You can set Shenandoah to be more aggressive, but the command line options for tuning Shenandoah are still marked as experimental. However, I’m fine with the default 5 minute delay.\n\njava \\\n  -XX:+UseShenandoahGC \\\n  -XX:+UnlockExperimentalVMOptions \\\n  -XX:ShenandoahUncommitDelay=1000 \\\n  -XX:ShenandoahGuaranteedGCInterval=10000 \\\n  -jar app.jar\n\n\nComments are welcome on Twitter or LinkedIn.\n\nLinks\n\n\n  JEP 346: Promptly Return Unused Committed Memory from G1\n  Garbage Collector Tuning as the First Step to Java Memory Usage Optimization\n  Shenandoah GC in production: experience report\n  Stackoverflow: Does GC release back memory to OS?\n  Stackoverflow: Does G1 GC release back memory to the OS even if Xms = Xmx?\n\n",
-  "datePublished": "2021-05-02 14:19:03 +0000",
-  "dateModified": "2021-05-02 14:19:03 +0000",
-  "author": {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Thomas Preißler",
-  "givenName": "Thomas",
-  "familyName": "Preißler",
-  "gender": "Male",
-  "email": "thomas@preissler.me",
-  "jobTitle": "Software Engineer",
-  "nationality": "Germany",
-  "url": "https://thomas.preissler.me",
-  "image": "https://thomas.preissler.me/assets/images/thomas.jpg",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Freiburg im Breisgau",
-    "addressCountry": "Germany"
-  },
-  "worksFor": [
-    {
-      "@type": "Organization",
-      "name": "NTT DATA DACH",
-      "sameAs": [
-        "https://de.nttdata.com/"
-      ]
-    }
-  ],
-  "alumniOf": [
-    {
-      "@type": "CollegeOrUniversity",
-      "name": "TU Wien",
-      "sameAs": "https://www.tuwien.at/"
-    },
-    {
-      "@type": "CollegeOrUniversity",
-      "name": "Staffordshire University",
-      "sameAs": "https://www.staffs.ac.uk/"
-    },
-    {
-      "@type": "CollegeOrUniversity",
-      "name": "Technische Hochschule Rosenheim",
-      "sameAs": "https://www.th-rosenheim.de"
-    }
-  ],
-  "sameAs": [
-    "https://twitter.com/TheThomasPr",
-    "https://github.com/ThomasPr",
-    "https://stackoverflow.com/users/915955/thomas-prei%c3%9fler",
-    "https://www.xing.com/profile/Thomas_Preissler",
-    "https://www.linkedin.com/in/thomas-preissler"
-  ]
-}
-,
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": "https://thomas.preissler.me/blog/2021/05/02/release-memory-back-to-the-os-with-java-11"
-  },
-  "image": {
-    "@type": "ImageObject",
-    "url": "https://thomas.preissler.me/assets/images/2021-05-02/os2.png"
-  }
-}
-
-  
-</script>
-
-<meta name="twitter:card" content="summary_large_image"></meta>
-
+    
   </head>
 
   <body class="layout--single wide">
@@ -368,6 +297,21 @@
           </h1>
           
 
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2021-05-02T14:19:03+00:00">May 2, 2021</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
 
         </header>
       
@@ -492,7 +436,7 @@
   </ul>
 </div>
 
-<div class="page__footer-copyright">&copy; 2022 Your Name. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+<div class="page__footer-copyright">&copy; 2022 Thomas Preißler. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
 
       </footer>
     </div>

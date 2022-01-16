@@ -34,6 +34,18 @@
 
 
 
+  <meta name="twitter:site" content="@TheThomasPr">
+  <meta name="twitter:title" content="Build a Cartesian Product with Java Streams">
+  <meta name="twitter:description" content="Building a Cartesian Product or Permutation is challenging. I used Java Streams to implement a readable algorithm.">
+  <meta name="twitter:url" content="https://thomas.preissler.me/blog/2020/12/29/permutations-using-java-streams">
+
+  
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://thomas.preissler.me/assets/images/2020-12-29/cartesian-product.png">
+  
+
+  
+
 
 
   <meta property="article:published_time" content="2020-12-29T20:40:00+00:00">
@@ -93,90 +105,7 @@
 
 
 
-    <link rel="icon" href="/assets/images/thomas.jpg" type="image/jpeg" />
-
-<script type="application/ld+json">
-  
-
-  
-    {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "url": "https://thomas.preissler.me/blog/2020/12/29/permutations-using-java-streams",
-  "name": "Build a Cartesian Product with Java Streams",
-  "headline": "Build a Cartesian Product with Java Streams",
-  "keywords": "",
-  "description": "Building a Cartesian Product or Permutation is challenging. I used Java Streams to implement a readable algorithm.",
-  "articleBody": "Recently, I ran over an old post by Baeldung: Permutations of an Array in Java\n. He presented very well solutions, as usual. I just want to provide another point of view: Readability. IMHO, readability is one of the most important aspects for code. Some time ago I had to solve a similiar issue and used Java Streams to create a Cartesian Product out of Lists.\n\nimport static java.util.Collections.unmodifiableList;\nimport static java.util.stream.Collectors.toList;\n\nimport java.util.ArrayList;\nimport java.util.List;\nimport java.util.Objects;\nimport java.util.function.BinaryOperator;\nimport java.util.stream.Stream;\n\npublic final class CartesianProductUtil {\n\n  private CartesianProductUtil() { }\n\n  /**\n   * Compute the cartesian product for n lists.\n   * The algorithm employs that A x B x C = (A x B) x C\n   *\n   * @param listsToJoin [a, b], [x, y], [1, 2]\n   * @return [a, x, 1], [a, x, 2], [a, y, 1], [a, y, 2], [b, x, 1], [b, x, 2], [b, y, 1], [b, y, 2]\n   */\n  public static &lt;T&gt; List&lt;List&lt;T&gt;&gt; cartesianProduct(List&lt;List&lt;T&gt;&gt; listsToJoin) {\n    if (listsToJoin.isEmpty()) {\n      return new ArrayList&lt;&gt;();\n    }\n\n    listsToJoin = new ArrayList&lt;&gt;(listsToJoin);\n    List&lt;T&gt; firstListToJoin = listsToJoin.remove(0);\n    Stream&lt;List&lt;T&gt;&gt; startProduct = joinLists(new ArrayList&lt;T&gt;(), firstListToJoin);\n\n    BinaryOperator&lt;Stream&lt;List&lt;T&gt;&gt;&gt; noOp = (a, b) -&gt; null;\n\n    return listsToJoin.stream() //\n        .filter(Objects::nonNull) //\n        .filter(list -&gt; !list.isEmpty()) //\n        .reduce(startProduct, CartesianProductUtil::joinToCartesianProduct, noOp) //\n        .collect(toList());\n  }\n\n  /**\n   * @param products [a, b], [x, y]\n   * @param toJoin   [1, 2]\n   * @return [a, b, 1], [a, b, 2], [x, y, 1], [x, y, 2]\n   */\n  private static &lt;T&gt; Stream&lt;List&lt;T&gt;&gt; joinToCartesianProduct(Stream&lt;List&lt;T&gt;&gt; products, List&lt;T&gt; toJoin) {\n    return products.flatMap(product -&gt; joinLists(product, toJoin));\n  }\n\n  /**\n   * @param list   [a, b]\n   * @param toJoin [1, 2]\n   * @return [a, b, 1], [a, b, 2]\n   */\n  private static &lt;T&gt; Stream&lt;List&lt;T&gt;&gt; joinLists(List&lt;T&gt; list, List&lt;T&gt; toJoin) {\n    return toJoin.stream().map(element -&gt; appendElementToList(list, element));\n  }\n\n  /**\n   * @param list    [a, b]\n   * @param element 1\n   * @return [a, b, 1]\n   */\n  private static &lt;T&gt; List&lt;T&gt; appendElementToList(List&lt;T&gt; list, T element) {\n    int capacity = list.size() + 1;\n    ArrayList&lt;T&gt; newList = new ArrayList&lt;&gt;(capacity);\n    newList.addAll(list);\n    newList.add(element);\n    return unmodifiableList(newList);\n  }\n}\n\n\nThe code is also available on this GitHub Gist.\n\nComments are welcome on LinkedIn.\n",
-  "datePublished": "2020-12-29 20:40:00 +0000",
-  "dateModified": "2020-12-29 20:40:00 +0000",
-  "author": {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "Thomas Preißler",
-  "givenName": "Thomas",
-  "familyName": "Preißler",
-  "gender": "Male",
-  "email": "thomas@preissler.me",
-  "jobTitle": "Software Engineer",
-  "nationality": "Germany",
-  "url": "https://thomas.preissler.me",
-  "image": "https://thomas.preissler.me/assets/images/thomas.jpg",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Freiburg im Breisgau",
-    "addressCountry": "Germany"
-  },
-  "worksFor": [
-    {
-      "@type": "Organization",
-      "name": "NTT DATA DACH",
-      "sameAs": [
-        "https://de.nttdata.com/"
-      ]
-    }
-  ],
-  "alumniOf": [
-    {
-      "@type": "CollegeOrUniversity",
-      "name": "TU Wien",
-      "sameAs": "https://www.tuwien.at/"
-    },
-    {
-      "@type": "CollegeOrUniversity",
-      "name": "Staffordshire University",
-      "sameAs": "https://www.staffs.ac.uk/"
-    },
-    {
-      "@type": "CollegeOrUniversity",
-      "name": "Technische Hochschule Rosenheim",
-      "sameAs": "https://www.th-rosenheim.de"
-    }
-  ],
-  "sameAs": [
-    "https://twitter.com/TheThomasPr",
-    "https://github.com/ThomasPr",
-    "https://stackoverflow.com/users/915955/thomas-prei%c3%9fler",
-    "https://www.xing.com/profile/Thomas_Preissler",
-    "https://www.linkedin.com/in/thomas-preissler"
-  ]
-}
-,
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": "https://thomas.preissler.me/blog/2020/12/29/permutations-using-java-streams"
-  },
-  "image": {
-    "@type": "ImageObject",
-    "url": "https://thomas.preissler.me/assets/images/2020-12-29/cartesian-product.png"
-  }
-}
-
-  
-</script>
-
-<meta name="twitter:card" content="summary_large_image"></meta>
-
+    
   </head>
 
   <body class="layout--single wide">
@@ -368,6 +297,21 @@
           </h1>
           
 
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2020-12-29T20:40:00+00:00">December 29, 2020</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
 
         </header>
       
@@ -519,7 +463,7 @@
   </ul>
 </div>
 
-<div class="page__footer-copyright">&copy; 2022 Your Name. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+<div class="page__footer-copyright">&copy; 2022 Thomas Preißler. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
 
       </footer>
     </div>
