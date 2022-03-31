@@ -1,7 +1,7 @@
 ---
-title:  "Using Typescript to validate translations at compile time"
+title:  "Using TypeScript to validate translations at compile time"
 date:   2022-03-30 21:36:32 +0200
-excerpt: "Translations stored in JSON can be validated at compile time with a Typescript type definition to avoid runtime errors."
+excerpt: "Translations stored in JSON can be validated at compile time with a TypeScript type definition to avoid runtime errors."
 header:
   og_image: /assets/images/2022-03-30/using-typescript-to-validate-translations-at-compile-time.png
 ---
@@ -61,9 +61,9 @@ As mentioned at the beginning, translations are usually loaded at runtime. There
 
 For this reason, errors should be found as early as possible and that is usually at compile time.
 
-Wouldn't it be great if the translation keys could be checked automatically? Let's jump into the power of Typescript.
+Wouldn't it be great if the translation keys could be checked automatically? Let's jump into the power of TypeScript.
 
-In Typescript there are these String Literal Types. Isn't it possible to check the translation keys at compile time and inform the developer about his mistake? It would only need a list of all possible translation keys. That is worth a try:
+In TypeScript there are these String Literal Types. Isn't it possible to check the translation keys at compile time and inform the developer about his mistake? It would only need a list of all possible translation keys. That is worth a try:
 
 ```typescript
 type TranslationKey =
@@ -99,9 +99,9 @@ Well...
 
 This solution requires the developer to maintain all translation keys twice: once in the actual translation and a second time in the definition of the `TranslationKey` type. These two definitions must always be kept in sync to avoid the above mentioned errors of missing translations. This process is tedious, error-prone and in the end does not lead to any improvement.
 
-Is there no way to create the `TranslationKey` type automatically? The Typescript compiler would only have to extract the translation keys from the JSON object and concatenate them with a dot.
+Is there no way to create the `TranslationKey` type automatically? The TypeScript compiler would only have to extract the translation keys from the JSON object and concatenate them with a dot.
 
-Indeed, Typescript can derive the `TranslationKey`!
+Indeed, TypeScript can derive the `TranslationKey`!
 
 ```typescript
 type DeepKeysOf<T, Key extends keyof T = keyof T> = Key extends string
@@ -123,13 +123,13 @@ T[Key] extends string ? Key : `${Key}.${DeepKeysOf<T[Key]>}`
 
 A practical example for `DeepKeysOf<typeof translation>`: `T` is the entire translation object, `Key` is a property of this, i.e. `helloWorld`, `dialog` or `action`. `T[Key]` is the value of this property, for the `Key` `helloWorld` it is `'Hello World!'` , for `dialog` it is the object `{ title: 'Bestätigung', description: 'Möchten Sie fortfahren?' }`. Thus, if `Key` is `helloWorld` then the expression `T[Key] extends string` holds true and thus the result of the expression will be `helloWorld`. On the other hand, if `Key` is `dialog`, then `T[Key]` is an object, the expression holds false, and the result is a concatenation of `dialog.` (including the dot) with the result of `DeepKeysOf<T['dialog']>`.
 
-However, it still has to be clarified how to iterate through the different properties within an object. For this purpose `keyof` and a type alias named `Key` is used: `Key extends keyof T = keyof T`. `keyof T` is an alias for all properties of the object `T` and allows in that way an iteration through all properties. `Key` then contains the current property selected by the iteration through `keyof T`. The actual iteration is performed by Typescript itself.
+However, it still has to be clarified how to iterate through the different properties within an object. For this purpose `keyof` and a type alias named `Key` is used: `Key extends keyof T = keyof T`. `keyof T` is an alias for all properties of the object `T` and allows in that way an iteration through all properties. `Key` then contains the current property selected by the iteration through `keyof T`. The actual iteration is performed by TypeScript itself.
 
-As a last point there is the wrapper `Key extends string ? ... : never` around the actual expression (abbreviated by ...). In the translation object `Key` is always a `string`, so this expression is actually not relevant. But Typescript does not actually know this, because this has not been defined. But for the later concatenation with `.` Typescript expects a `string` (or several other types). By the way, the else branch with the result `never` is not called with the translation object. But if the object would contain some keys which are not `string` (i.e. `number`, or similar), then using `never` the corresponding invalid branches in the input object would be ignored.
+As a last point there is the wrapper `Key extends string ? ... : never` around the actual expression (abbreviated by ...). In the translation object `Key` is always a `string`, so this expression is actually not relevant. But TypeScript does not actually know this, because this has not been defined. But for the later concatenation with `.` TypeScript expects a `string` (or several other types). By the way, the else branch with the result `never` is not called with the translation object. But if the object would contain some keys which are not `string` (i.e. `number`, or similar), then using `never` the corresponding invalid branches in the input object would be ignored.
 
-This entire implementation is also available for simple follow up on the [Typescript Playground](https://www.typescriptlang.org/play?#code/PTAEFUGcEsDsHNQBUCeAHAppAxgJ2mgC6iED2oAbgIYA20AJlYRiblbJDU9KR6E6GykAtmmg0WhaMIwAoEKAAWhQmkgAuEIUUiqkAHRpcGaJE4Zc+mcABGNUvGAAmAAxOnwFwGZgXl8ABXGAQAWkJ0LDwCQjDSEOo6RmYwtg4uKV5IEKYQoVFxDDDpOVkhDmJCVM5uXlAAXlAAb1lQJQwaewB1UlwaenVQAHIACVp7UE72wgBCQYAaFtB6aFoHAebW1qlCCQHBgCEsQgATqXgAhHnF1vpI-CIeWD2AWQA37GUMWFAAZWgWABmPUIAKoimMsAA-INFgBfBatKjYDIcdbXUA2AIqTJozabSABGzCaCEPaHSAnM5fK541rYdjYdp7ACCNhsxg+1PRsLhsh5snCmFAABEMBg0ABpDAoSAAeQBAB4kHNQFKUKAMAAPZiweiQUAAa2lpAByHqhuNpqQAD56ui1RrtV89aAKfgEOjIcgANpqgC6jp1LrdcEQXodAwABgASRpq2H6WOi8VquWKpC+6V+62wyPogawDAUCyyAURZBVdKPB0NZOS6VphWCjAm1jsaoo60AblLzd+lVDstgNBQAClILUGiGEKAAD5NUDeoykTC4cIDafwP0DH4DhBDkfj2qwnulTIVStMFgNAAUlXbVd4aoGSEvKLVAEoN3vEHVbRtNjKClQGMAkaGIBp7zSGpYDVdE8X0SA0DoQgbwAIn0NCP3gzZ9GMegAkZG8cNpUAbwAKwnWAVWXVdwgAOSoGQP3qW1m1bSjJzqBpBlIGxyIwZFBlAL1ONgJdcBXCwGKYjAAwGC5bgBOAMHoBFSNpKCO0efh9V3d14APMcqLnUBFIwZTC3oD8ezxYxCACXBvnY01QICcD6m4oZN2Er03I8gYtMfWDpR7E9ezfDAb0GZZVngfRtgkQYbIFSLoti+x4sUDAqFuXBkp7IA).
+This entire implementation is also available for simple follow up on the [TypeScript Playground](https://www.typescriptlang.org/play?#code/PTAEFUGcEsDsHNQBUCeAHAppAxgJ2mgC6iED2oAbgIYA20AJlYRiblbJDU9KR6E6GykAtmmg0WhaMIwAoEKAAWhQmkgAuEIUUiqkAHRpcGaJE4Zc+mcABGNUvGAAmAAxOnwFwGZgXl8ABXGAQAWkJ0LDwCQjDSEOo6RmYwtg4uKV5IEKYQoVFxDDDpOVkhDmJCVM5uXlAAXlAAb1lQJQwaewB1UlwaenVQAHIACVp7UE72wgBCQYAaFtB6aFoHAebW1qlCCQHBgCEsQgATqXgAhHnF1vpI-CIeWD2AWQA37GUMWFAAZWgWABmPUIAKoimMsAA-INFgBfBatKjYDIcdbXUA2AIqTJozabSABGzCaCEPaHSAnM5fK541rYdjYdp7ACCNhsxg+1PRsLhsh5snCmFAABEMBg0ABpDAoSAAeQBAB4kHNQFKUKAMAAPZiweiQUAAa2lpAByHqhuNpqQAD56ui1RrtV89aAKfgEOjIcgANpqgC6jp1LrdcEQXodAwABgASRpq2H6WOi8VquWKpC+6V+62wyPogawDAUCyyAURZBVdKPB0NZOS6VphWCjAm1jsaoo60AblLzd+lVDstgNBQAClILUGiGEKAAD5NUDeoykTC4cIDafwP0DH4DhBDkfj2qwnulTIVStMFgNAAUlXbVd4aoGSEvKLVAEoN3vEHVbRtNjKClQGMAkaGIBp7zSGpYDVdE8X0SA0DoQgbwAIn0NCP3gzZ9GMegAkZG8cNpUAbwAKwnWAVWXVdwgAOSoGQP3qW1m1bSjJzqBpBlIGxyIwZFBlAL1ONgJdcBXCwGKYjAAwGC5bgBOAMHoBFSNpKCO0efh9V3d14APMcqLnUBFIwZTC3oD8ezxYxCACXBvnY01QICcD6m4oZN2Er03I8gYtMfWDpR7E9ezfDAb0GZZVngfRtgkQYbIFSLoti+x4sUDAqFuXBkp7IA).
 
-In the end, this solution is very powerful, thanks to Typescript's extensive type system. Translations are no longer as error-prone as I know from my past. Overall, a single type definition increases the quality of the software and this quality can also be checked automatically at compile-time.
+In the end, this solution is very powerful, thanks to TypeScript's extensive type system. Translations are no longer as error-prone as I know from my past. Overall, a single type definition increases the quality of the software and this quality can also be checked automatically at compile-time.
 
 
 
