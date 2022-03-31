@@ -40,4 +40,10 @@ var store = [{
         "tags": [],
         "url": "/blog/2022/01/10/implementing-a-timeline-with-scrolling-and-zooming-or-how-i-failed-at-elementary-school-math",
         "teaser": null
+      },{
+        "title": "Using Typescript to validate translations at compile time",
+        "excerpt":"In web applications as I know them, translations are mostly stored in JSONish format and accessed at runtime. Usually, the setup is more complex since the applications needs to support multiple translations. But for now let’s keep it as simple as possible. const translation = { helloWorld: 'Hallo Welt!', dialog:...","categories": [],
+        "tags": [],
+        "url": "/blog/2022/03/30/using-typescript-to-validate-translations-at-compile-time",
+        "teaser": null
       }]
