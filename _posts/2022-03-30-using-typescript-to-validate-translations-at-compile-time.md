@@ -131,5 +131,4 @@ This entire implementation is also available for simple follow up on the [TypeSc
 
 In the end, this solution is very powerful, thanks to TypeScript's extensive type system. Translations are no longer as error-prone as I know from my past. Overall, a single type definition increases the quality of the software and this quality can also be checked automatically at compile-time.
 
-
-
+Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1509516711434895364) or [LinkedIn](https://www.linkedin.com/posts/thomas-preissler_using-typescript-to-validate-translations-activity-6915282669471698944-PGmU).
