@@ -95,6 +95,9 @@ author:
   bio      : "software developer,<br />addicted to KISS"
   location : "Freiburg, Germany"
   links:
+    - label: "NTT DATA"
+      icon: "fas fa-fw fa-building"
+      url: "https://de.nttdata.com/"
     - label: "Email"
       icon: "fas fa-fw fa-envelope"
       url: "mailto:thomas@preissler.me"
