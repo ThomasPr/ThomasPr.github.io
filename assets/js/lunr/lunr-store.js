@@ -46,4 +46,10 @@ var store = [{
         "tags": [],
         "url": "/blog/2022/03/30/using-typescript-to-validate-translations-at-compile-time",
         "teaser": null
+      },{
+        "title": "Testing TypeScript Defintions",
+        "excerpt":"TypeScript type definitions can be quite complex. They need to be tested to avoid mistakes during implementation and refactoring. Introducing the Example In my last post, I showed how to use TypeScript to check translations and their usage at compile time. I would like to briefly recall this example. I...","categories": [],
+        "tags": [],
+        "url": "/blog/2022/04/27/testing-typescript-definitions",
+        "teaser": null
       }]

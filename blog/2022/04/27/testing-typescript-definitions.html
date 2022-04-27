@@ -1,0 +1,475 @@
+<!doctype html>
+<!--
+  Minimal Mistakes Jekyll Theme 4.24.0 by Michael Rose
+  Copyright 2013-2020 Michael Rose - mademistakes.com | @mmistakes
+  Free for personal and commercial use under the MIT license
+  https://github.com/mmistakes/minimal-mistakes/blob/master/LICENSE
+-->
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+
+<!-- begin _includes/seo.html --><title>Testing TypeScript Defintions - Thomas’ Blog</title>
+<meta name="description" content="TypeScript type definitions can be quite complex. They need to be tested to avoid mistakes during implementation and refactoring.">
+
+
+  <meta name="author" content="Thomas Preißler">
+  
+  <meta property="article:author" content="Thomas Preißler">
+  
+
+
+<meta property="og:type" content="article">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Thomas' Blog">
+<meta property="og:title" content="Testing TypeScript Defintions">
+<meta property="og:url" content="https://thomas.preissler.me/blog/2022/04/27/testing-typescript-definitions">
+
+
+  <meta property="og:description" content="TypeScript type definitions can be quite complex. They need to be tested to avoid mistakes during implementation and refactoring.">
+
+
+
+  <meta property="og:image" content="https://thomas.preissler.me/assets/images/2022-04-27/testing-typescript-definitions.png">
+
+
+
+
+
+  <meta property="article:published_time" content="2022-04-27T16:00:00+00:00">
+
+
+
+
+
+  
+
+  
+
+
+<link rel="canonical" href="https://thomas.preissler.me/blog/2022/04/27/testing-typescript-definitions">
+
+
+
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    
+      "@type": "Person",
+      "name": "Thomas Preißler",
+      "url": "https://thomas.preissler.me/",
+      "sameAs": ["https://twitter.com/TheThomasPr","https://github.com/ThomasPr","https://stackoverflow.com/users/915955/thomas-prei%c3%9fler","https://www.xing.com/profile/Thomas_Preissler","https://www.linkedin.com/in/thomas-preissler/"]
+    
+  }
+</script>
+
+
+  <meta name="google-site-verification" content="VhaciMaca92rdlXRrqBBFXCR1hxERcyhW4Kqq7XafWM" />
+
+
+
+
+
+
+<!-- end _includes/seo.html -->
+
+
+
+  <link href="/feed.xml" type="application/atom+xml" rel="alternate" title="Thomas' Blog Feed">
+
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script>
+  document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="/assets/css/main.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
+
+
+
+    <link rel="icon" href="/assets/images/thomas.jpg" type="image/jpeg" />
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@TheThomasPr">
+
+  </head>
+
+  <body class="layout--single wide">
+    <nav class="skip-links">
+  <ul>
+    <li><a href="#site-nav" class="screen-reader-shortcut">Skip to primary navigation</a></li>
+    <li><a href="#main" class="screen-reader-shortcut">Skip to content</a></li>
+    <li><a href="#footer" class="screen-reader-shortcut">Skip to footer</a></li>
+  </ul>
+</nav>
+
+    <!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience.</div>
+<![endif]-->
+
+    
+
+<div class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        
+        <a class="site-title" href="/">
+          Thomas' Blog
+          
+        </a>
+        <ul class="visible-links"><li class="masthead__menu-item">
+              <a href="/">Blog</a>
+            </li><li class="masthead__menu-item">
+              <a href="/about">About</a>
+            </li></ul>
+        
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">Toggle menu</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+
+    <div class="initial-content">
+      
+
+
+
+<div id="main" role="main">
+  
+  <div class="sidebar sticky">
+  
+
+
+<div itemscope itemtype="https://schema.org/Person" class="h-card">
+
+  
+    <div class="author__avatar">
+      <a href="https://thomas.preissler.me/">
+        <img src="/assets/images/thomas.jpg" alt="Thomas Preißler" itemprop="image" class="u-photo">
+      </a>
+    </div>
+  
+
+  <div class="author__content">
+    <h3 class="author__name p-name" itemprop="name">
+      <a class="u-url" rel="me" href="https://thomas.preissler.me/" itemprop="url">Thomas Preißler</a>
+    </h3>
+    
+      <div class="author__bio p-note" itemprop="description">
+        <p>software developer,<br />addicted to KISS</p>
+
+      </div>
+    
+  </div>
+
+  <div class="author__urls-wrapper">
+    <button class="btn btn--inverse">Follow</button>
+    <ul class="author__urls social-icons">
+      
+        <li itemprop="homeLocation" itemscope itemtype="https://schema.org/Place">
+          <i class="fas fa-fw fa-map-marker-alt" aria-hidden="true"></i> <span itemprop="name" class="p-locality">Freiburg, Germany</span>
+        </li>
+      
+
+      
+        
+          
+            <li><a href="https://de.nttdata.com/" rel="nofollow noopener noreferrer me"><i class="fas fa-fw fa-building" aria-hidden="true"></i><span class="label">NTT DATA</span></a></li>
+          
+        
+          
+            <li><a href="mailto:thomas@preissler.me" rel="nofollow noopener noreferrer me"><i class="fas fa-fw fa-envelope" aria-hidden="true"></i><span class="label">Email</span></a></li>
+          
+        
+          
+            <li><a href="https://twitter.com/TheThomasPr" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-twitter" aria-hidden="true"></i><span class="label">Twitter</span></a></li>
+          
+        
+          
+            <li><a href="https://github.com/ThomasPr" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-github" aria-hidden="true"></i><span class="label">GitHub</span></a></li>
+          
+        
+          
+            <li><a href="https://stackoverflow.com/users/915955/thomas-prei%c3%9fler" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-stack-overflow" aria-hidden="true"></i><span class="label">Stack Overflow</span></a></li>
+          
+        
+          
+            <li><a href="https://www.xing.com/profile/Thomas_Preissler" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-xing" aria-hidden="true"></i><span class="label">Xing</span></a></li>
+          
+        
+          
+            <li><a href="https://www.linkedin.com/in/thomas-preissler" rel="nofollow noopener noreferrer me"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span class="label">LinkedIn</span></a></li>
+          
+        
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      
+
+      <!--
+  <li>
+    <a href="http://link-to-whatever-social-network.com/user/" itemprop="sameAs" rel="nofollow noopener noreferrer me">
+      <i class="fas fa-fw" aria-hidden="true"></i> Custom Social Profile Link
+    </a>
+  </li>
+-->
+    </ul>
+  </div>
+</div>
+  
+  </div>
+
+
+
+  <article class="page h-entry" itemscope itemtype="https://schema.org/CreativeWork">
+    <meta itemprop="headline" content="Testing TypeScript Defintions">
+    <meta itemprop="description" content="TypeScript type definitions can be quite complex. They need to be tested to avoid mistakes during implementation and refactoring.">
+    <meta itemprop="datePublished" content="2022-04-27T16:00:00+00:00">
+    
+
+    <div class="page__inner-wrap">
+      
+        <header>
+          <h1 id="page-title" class="page__title p-name" itemprop="headline">
+            <a href="https://thomas.preissler.me/blog/2022/04/27/testing-typescript-definitions" class="u-url" itemprop="url">Testing TypeScript Defintions
+</a>
+          </h1>
+          
+
+  <p class="page__meta">
+    
+      
+      <span class="page__meta-date">
+        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+        
+        <time datetime="2022-04-27T16:00:00+00:00">April 27, 2022</time>
+      </span>
+    
+
+    
+
+    
+  </p>
+
+
+        </header>
+      
+
+      <section class="page__content e-content" itemprop="text">
+        
+        <p>TypeScript type definitions can be quite complex. They need to be tested to avoid mistakes during implementation and refactoring.</p>
+
+<h2 id="introducing-the-example">Introducing the Example</h2>
+
+<p>In my last post, I showed how to use TypeScript to check translations and their usage at compile time. I would like to briefly recall this example.</p>
+
+<p>I defined a <code class="language-plaintext highlighter-rouge">type DeepKeysOf</code>, which returns all possible nested keys from one object.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">type</span> <span class="nx">DeepKeysOf</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">,</span> <span class="nx">Key</span> <span class="kd">extends</span> <span class="kr">keyof</span> <span class="nx">T</span> <span class="o">=</span> <span class="kr">keyof</span> <span class="nx">T</span><span class="o">&gt;</span> <span class="o">=</span> <span class="nx">Key</span> <span class="kd">extends</span> <span class="kr">string</span>
+  <span class="p">?</span> <span class="nx">T</span><span class="p">[</span><span class="nx">Key</span><span class="p">]</span> <span class="kd">extends</span> <span class="kr">string</span> <span class="p">?</span> <span class="nx">Key</span> <span class="p">:</span> <span class="s2">`</span><span class="p">${</span><span class="nx">Key</span><span class="p">}</span><span class="s2">.</span><span class="p">${</span><span class="nx">DeepKeysOf</span><span class="o">&lt;</span><span class="nx">T</span><span class="p">[</span><span class="nx">Key</span><span class="p">]</span><span class="o">&gt;</span><span class="p">}</span><span class="s2">`</span>
+  <span class="p">:</span> <span class="nx">never</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>If this type definition is used for the translate method now, the compiler can already point out faulty translations.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">translation</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">dialog</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">title</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Bestätigung</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">description</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Möchten Sie fortfahren?</span><span class="dl">'</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">TranslationKey</span> <span class="o">=</span> <span class="nx">DeepKeysOf</span><span class="o">&lt;</span><span class="k">typeof</span> <span class="nx">translation</span><span class="o">&gt;</span><span class="p">;</span> <span class="c1">// 'dialog.title' | 'dialog.description'</span>
+
+<span class="kd">const</span> <span class="nx">translate</span> <span class="o">=</span> <span class="p">(</span><span class="nx">translationKey</span><span class="p">:</span> <span class="nx">TranslationKey</span><span class="p">):</span> <span class="kr">string</span> <span class="o">=&gt;</span> <span class="p">{</span>
+  <span class="c1">// omit the actual implementation</span>
+<span class="p">}</span>
+
+<span class="nx">translate</span><span class="p">(</span><span class="dl">'</span><span class="s1">dialog.title</span><span class="dl">'</span><span class="p">);</span> <span class="c1">// compiles fine</span>
+<span class="nx">translate</span><span class="p">(</span><span class="dl">'</span><span class="s1">dialog.header</span><span class="dl">'</span><span class="p">);</span> <span class="c1">// compiler error: Argument of type '"dialog.header"' is not assignable to parameter of type 'TranslationKey'.</span>
+</code></pre></div></div>
+
+<p>The full example with more detailed explanations can be found in my <a href="/blog/2022/03/30/using-typescript-to-validate-translations-at-compile-time">previous post</a> or in this <a href="https://www.typescriptlang.org/play?#code/PTAEFUGcEsDsHNQBUCeAHAppAxgJ2mgC6iED2oAbgIYA20AJlYRiblbJDU9KR6E6GykAtmmg0WhaMIwAoEKAAWhQmkgAuEIUUiqkAHRpcGaJE4Zc+mcABGNUvGAAmAAxOnwFwGZgXl8ABXGAQAWkJ0LDwCQjDSEOo6RmYwtg4uKV5IEKYQoVFxDDDpOVkhDmJCVM5uXlAAXlAAb1lQJQwaewB1UlwaenVQAHIACVp7UE72wgBCQYAaFtB6aFoHAebW1qlCCQHBgCEsQgATqXgAhHnF1vpI-CIeWD2AWQA37GUMWFAAZWgWABmPUIAKoimMsAA-INFgBfBatKjYDIcdbXUA2AIqTJozabSABGzCaCEPaHSAnM5fK541rYdjYdp7ACCNhsxg+1PRsLhsh5snCmFAABEMBg0ABpDAoSAAeQBAB4kHNQFKUKAMAAPZiweiQUAAa2lpAByHqhuNpqQAD56ui1RrtV89aAKfgEOjIcgANpqgC6jp1LrdcEQXodAwABgASRpq2H6WOi8VquWKpC+6V+62wyPogawDAUCyyAURZBVdKPB0NZOS6VphWCjAm1jsaoo60AblLzd+lVDstgNBQAClILUGiGEKAAD5NUDeoykTC4cIDafwP0DH4DhBDkfj2qwnulTIVStMFgNAAUlXbVd4aoGSEvKLVAEoN3vEHVbRtNjKClQGMAkaGIBp7zSGpYDVdE8X0SA0DoQgbwAIn0NCP3gzZ9GMegAkZG8cNpUAbwAKwnWAVWXVdwgAOSoGQP3qW1m1bSjJzqBpBlIGxyIwZFBlAL1ONgJdcBXCwGKYjAAwGC5bgBOAMHoBFSNpKCO0efh9V3d14APMcqLnUBFIwZTC3oD8ezxYxCACXBvnY01QICcD6m4oZN2Er03I8gYtMfWDpR7E9ezfDAb0GZZVngfRtgkQYbIFSLoti+x4sUDAqFuXBkp7IA">TypeScript Playground</a>.</p>
+
+<h2 id="testing">Testing</h2>
+
+<p>Looking at the implementation, some issues stand out that need to be addressed:</p>
+
+<ul>
+  <li>The definition is quite complex and not obvious at first sight.</li>
+  <li>Check if the implementation works as expected, in the good case as well as in the bad case.</li>
+  <li>Refactorings should not lead to new errors.</li>
+  <li>Document the use of <code class="language-plaintext highlighter-rouge">DeepKeysOf</code>.</li>
+</ul>
+
+<p>All these points apply in general to any code, not only to type definitions. The key is to write unit tests. And this is exactly what I want to do for TypeScript’s type definitions.</p>
+
+<p>The big difference to usual unit tests is that type definitions exist only at compile time. This implies that the tests also have to be executed by the compiler rather than at runtime like all other unit tests. This sounds complicated, but is actually fairly easy. In the following I want to briefly introduce the possibilities with <code class="language-plaintext highlighter-rouge">ts-expect-error</code> and <code class="language-plaintext highlighter-rouge">expect-type</code>.</p>
+
+<h3 id="ts-expect-error">ts-expect-error</h3>
+
+<p><code class="language-plaintext highlighter-rouge">ts-excpect-error</code> was introduces with <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-9.html#-ts-expect-error-comments">TypeScript 3.9</a>. This instructs TypeScript to expect a compiler error on the following line. If a line is preceded by a <code class="language-plaintext highlighter-rouge">// @ts-expect-error</code> comment, TypeScript suppresses the reporting of this error; but if there is no error, TypeScript reports that <code class="language-plaintext highlighter-rouge">// @ts-expect-error</code> was not necessary.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">translate</span><span class="p">(</span><span class="dl">'</span><span class="s1">dialog.title</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="c1">// @ts-expect-error</span>
+<span class="nx">translate</span><span class="p">(</span><span class="dl">'</span><span class="s1">dialog.header</span><span class="dl">'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>The actual type definition of <code class="language-plaintext highlighter-rouge">DeepKeysOf</code> can be tested without using the <code class="language-plaintext highlighter-rouge">translate</code> method:</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// @ts-expect-error</span>
+<span class="kd">const</span> <span class="nx">invalidKey</span><span class="p">:</span> <span class="nx">DeepKeysOf</span><span class="o">&lt;</span><span class="k">typeof</span> <span class="nx">translation</span><span class="o">&gt;</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">dialog.header</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>A complete example can be found at <a href="https://www.typescriptlang.org/play?#code/PTAEBUFMGcBcEsB2BzCBPADpAygYwE7waygAikAZkvAgPaLQBQIoAFrLBtAFwiyu0AtgENoAOgz5I8aNAA2kfGMGRgAIzm1kwAEwAGHTuB6ALLoBswWDAQoAtLEwwCRWHYAmlanQaNGuejhQWHxhBjlhH1AAXlAAb0ZQNkg5TQB1Wnw5d25QAHIACWFU2lA0lNgAQjyAGkTQd3hirVyEpKSEWAVcvIAhGwAThGQAVxRa+qTPaBdieHoegFkAN9x2SERQbHhIUApM2AphVilEAH48+oBfOqThXB8eeMnQNRGOQNaXpOgRtUEaD1+nAhvBkBsJu12rgwrgUj0AIJqNRSNYQl5Xa6MTGMRxYMiQSAYADSkDQ0AA8hQADzgGqgUloUCQAAe1kQ7mgoAA1mTaBQIDEeXyBeAAHwxF6M5lsjac0BwQgoF5nCAAbUZAF0Zez5YqkKhVdLcgADAAkcUZVzEFvIRMZlJp4A1ZM1YquJpeuUQkAAboo-HjduBQuFIvNENLYnaSWTHdSg-zgqH5OH6GKANyBpxbEIGimIORoABS0HoQv1KFAAB94qA1ZJaFh8I5cpXkJrctg8ygC0XS+Wrln-IESCEwqnrEKABTjsM+Rm5EMTiILskASjbPdQ0QlbWho9AUl+chIsTnk4jjO+7TE0Awcho04ARGJn+ub0kxFJ3CM4dPPyhUBpwAKzLRB6UbZtHAAOWEFR1xiCVEwFMDy2iDD8loNQQMgB48lAVU0MQBt8CbRRYPgyBtVyMZPCoH13FuICWIvVcI1AURcyVZA+xLcCa1AOivEY9csyhKRYBGfBNhQo8YBGU8YkwvJ2wI1Vj0UkhcjYtNIzJLMhz8XEU1XSBpzyRpmmQMROgUPIxOYMAAAFYGgOxWSwB4PPwMj8BMldInMyymk0GzWEgYRPHwBzhwCBgSF9Yp4HcRcCXtOMqQTJwk10nwJViELrNsmh7KzFhXPczy8LcRQ-JHBLQCQJLH1SslchjB0srkvKIwK-IrLCsQIqixQ8izIA">TypeScript Playground</a>.</p>
+
+<p>This is a very simple approach and can be used without additional libraries. However, the solution is not very verbose, in unit test usually the expected result is explicitly given.</p>
+
+<h3 id="expect-type">expect-type</h3>
+
+<p><a href="https://www.npmjs.com/package/expect-type">expect-type</a> is a library developed for exactly this purpose: Testing type definitions.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">translation</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">dialog</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">title</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Bestätigung</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">description</span><span class="p">:</span> <span class="dl">'</span><span class="s1">Möchten Sie fortfahren?</span><span class="dl">'</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">TranslationKey</span> <span class="o">=</span> <span class="nx">DeepKeysOf</span><span class="o">&lt;</span><span class="k">typeof</span> <span class="nx">translation</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="nx">expectTypeOf</span><span class="o">&lt;</span><span class="dl">'</span><span class="s1">dialog.title</span><span class="dl">'</span><span class="o">&gt;</span><span class="p">().</span><span class="nx">toMatchTypeOf</span><span class="o">&lt;</span><span class="nx">TranslationKey</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="nx">expectTypeOf</span><span class="o">&lt;</span><span class="dl">'</span><span class="s1">dialog.header</span><span class="dl">'</span><span class="o">&gt;</span><span class="p">().</span><span class="nx">not</span><span class="p">.</span><span class="nx">toMatchTypeOf</span><span class="o">&lt;</span><span class="nx">TranslationKey</span><span class="o">&gt;</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>In my opinion <code class="language-plaintext highlighter-rouge">expectTypeOf</code> is a very smart solution, but it adds another dependency to the project.</p>
+
+        
+      </section>
+
+      <footer class="page__meta">
+        
+        
+
+
+        
+
+  <p class="page__date"><strong><i class="fas fa-fw fa-calendar-alt" aria-hidden="true"></i> Updated:</strong> <time class="dt-published" datetime="2022-04-27T16:00:00+00:00">April 27, 2022</time></p>
+
+      </footer>
+
+      
+
+      
+    </div>
+
+    
+  </article>
+
+  
+  
+</div>
+    </div>
+
+    
+
+    <div id="footer" class="page__footer">
+      <footer>
+        <!-- start custom footer snippets -->
+
+<!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+  <ul class="social-icons">
+    
+
+    
+      
+        
+          <li><a href="https://github.com/ThomasPr/ThomasPr.github.io" rel="nofollow noopener noreferrer"><i class="fab fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+        
+      
+    
+
+    
+      <li><a href="/feed.xml"><i class="fas fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+    
+  </ul>
+</div>
+
+<div class="page__footer-copyright">&copy; 2022 Thomas Preißler. Powered by <a href="https://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.</div>
+
+      </footer>
+    </div>
+
+    
+  <script src="/assets/js/main.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+  </body>
+</html>
