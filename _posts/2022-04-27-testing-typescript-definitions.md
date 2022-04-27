@@ -100,3 +100,5 @@ expectTypeOf<'dialog.header'>().not.toMatchTypeOf<TranslationKey>();
 ```
 
 In my opinion `expectTypeOf` is a very smart solution, but it adds another dependency to the project.
+
+Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1519349400753082369) or [LinkedIn](https://www.linkedin.com/posts/thomas-preissler_testing-typescript-defintions-activity-6925115513165545472-HQhI).
