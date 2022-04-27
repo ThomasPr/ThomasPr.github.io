@@ -1,6 +1,6 @@
 ---
 title:  "Testing TypeScript Defintions"
-date:   2022-04-27 19:00:00 +0200
+date:   2022-04-27 18:00:00 +0200
 excerpt: "TypeScript type definitions can be quite complex. They need to be tested to avoid mistakes during implementation and refactoring."
 header:
   og_image: /assets/images/2022-04-27/testing-typescript-definitions.png
