@@ -23,3 +23,5 @@ By clicking this link, the browser will download the file instead of linking to 
 The [browser support](https://caniuse.com/download) for this attribute is pretty good with support by all major desktop and mobile browsers.
 
 More details can be found at the [MDN docs](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#attr-download).
+
+Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1521745346937991169) or [LinkedIn](https://www.linkedin.com/posts/thomas-preissler_download-a-file-by-an-anchor-element-only-activity-6927511231180234752-D-Vz).
