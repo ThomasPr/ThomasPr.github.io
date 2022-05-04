@@ -52,4 +52,10 @@ var store = [{
         "tags": [],
         "url": "/blog/2022/04/27/testing-typescript-definitions",
         "teaser": null
+      },{
+        "title": "Download a file by an anchor-element only. No more Content-Disposition!",
+        "excerpt":"In the past I used the HTTP header Content-Disposition to instruct the browser to download a file. I ended up doing this because I knew of no other way for this. Until today. I discovered, that the anchor-element has a download attribute. &lt;a href=\"35567e83.pdf\" download=\"report-2022.pdf\"&gt; Download Report &lt;/a&gt; By clicking...","categories": [],
+        "tags": [],
+        "url": "/blog/2022/05/04/download-a-file-by-an-anchor-element-only",
+        "teaser": null
       }]
