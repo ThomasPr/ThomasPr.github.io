@@ -1,4 +1,134 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://thomas.preissler.me/feed.xml" rel="self" type="application/atom+xml" /><link href="https://thomas.preissler.me/" rel="alternate" type="text/html" /><updated>2022-05-04T06:58:57+00:00</updated><id>https://thomas.preissler.me/feed.xml</id><title type="html">Thomas’ Blog</title><subtitle>My personal thoughts on technology and oddities.</subtitle><author><name>Thomas Preißler</name></author><entry><title type="html">Download a file by an anchor-element only. No more Content-Disposition!</title><link href="https://thomas.preissler.me/blog/2022/05/04/download-a-file-by-an-anchor-element-only" rel="alternate" type="text/html" title="Download a file by an anchor-element only. No more Content-Disposition!" /><published>2022-05-04T06:00:00+00:00</published><updated>2022-05-04T06:00:00+00:00</updated><id>https://thomas.preissler.me/blog/2022/05/04/download-a-file-by-an-anchor-element-only</id><content type="html" xml:base="https://thomas.preissler.me/blog/2022/05/04/download-a-file-by-an-anchor-element-only"><![CDATA[<p>In the past I used the HTTP header <code class="language-plaintext highlighter-rouge">Content-Disposition</code> to instruct the browser to download a file. I ended up doing this because I knew of no other way for this.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://thomas.preissler.me/feed.xml" rel="self" type="application/atom+xml" /><link href="https://thomas.preissler.me/" rel="alternate" type="text/html" /><updated>2022-06-21T14:10:51+00:00</updated><id>https://thomas.preissler.me/feed.xml</id><title type="html">Thomas’ Blog</title><subtitle>My personal thoughts on technology and oddities.</subtitle><author><name>Thomas Preißler</name></author><entry><title type="html">OpenTelemetry with Quarkus to push distributed traces to AWS X-Ray.</title><link href="https://thomas.preissler.me/blog/2022/06/21/quarkus-with-opentelemetry" rel="alternate" type="text/html" title="OpenTelemetry with Quarkus to push distributed traces to AWS X-Ray." /><published>2022-06-21T14:00:00+00:00</published><updated>2022-06-21T14:00:00+00:00</updated><id>https://thomas.preissler.me/blog/2022/06/21/quarkus-with-opentelemetry</id><content type="html" xml:base="https://thomas.preissler.me/blog/2022/06/21/quarkus-with-opentelemetry"><![CDATA[<p>Distributed Tracing enables a DevOps team to observe user requests as they travel through multiple services and applications in a microservices landscape. It provides a centralized view of how user requests are performing across all involved services. Nowadays, a microservice architecture consists of many self-developed as well as hosted and preconfigured services such as API gateways, load balancers or databases. To get a deep insight into the overall microservice architecture, traces of self-developed microservices need to be combined with traces of hosted services. AWS X-Ray can be employed for this purpose, but it adds a vendor-specific javaagent to the application. Alternatively, OpenTelemetry can be used to get traces from self-developed applications and push them to AWS X-Ray. The result is similar, traces can be observed for the entire microservices landscape, but it avoids adding the AWS X-Ray javaagent to the self-developed application.</p>
+
+<p>OpenTelemetry is the new shining star on the Observability horizon. It aims to standardize the three pillars of observability: Tracing, Logging, and Metrics. OpenTelemetry is a set of vendor-independent APIs and SDKs for collecting and exporting telemetry data. To obtain distributed traces of an application, only the general OpenTelemetry interface needs to be integrated without a vendor-specific implementation or library. The three major cloud providers, <a href="https://aws.amazon.com/otel">AWS</a>, <a href="https://docs.microsoft.com/azure/azure-monitor/app/opentelemetry-overview">Azure</a> and <a href="https://cloud.google.com/learn/what-is-opentelemetry">Google</a>, already provide an interface from OpenTelemetry to their hosted tracing solutions. I expect OpenTelemetry to be the only widely used observability API in the future. It already provides good support for tracing and metrics, but they are still working on the specification for logging.</p>
+
+<p>AWS X-Ray has two key advantages over a self-hosted solution like Jaeger: It is a fully AWS-hosted service that includes setup, authentication, and updates. In addition, many other AWS services such as API Gateway or DynamoDB report their traces to AWS X-Ray. This provides visibility into the entire microservices infrastructure, not just the self-developed services.</p>
+
+<p><strong>In this article I want to show how to integrate OpenTelemetry into a Java Quarkus microservice in order to send distributed traces to AWS X-Ray. No javaagent is required and it supports the Quarkus native mode. This solution enables observation of the entire microservice infrastructure, including services hosted by AWS.</strong></p>
+
+<p>The setup consists of four steps:</p>
+
+<ol>
+  <li><a href="#1-integrate-opentelemetry-into-the-quarkus-application">Integrate OpenTelemetry into the Quarkus application</a></li>
+  <li><a href="#2-adjust-the-trace-id-generation">Adjust the Trace-ID generation</a></li>
+  <li><a href="#3-use-the-aws-context-propagation">Use the AWS Context Propagation</a></li>
+  <li><a href="#4-run-the-opentelemetry-collector">Run the OpenTelemetry Collector</a></li>
+</ol>
+
+<h2 id="1-integrate-opentelemetry-into-the-quarkus-application">1. Integrate OpenTelemetry into the Quarkus application</h2>
+
+<p>There are two different ways to instrument an application to get tracing data with OpenTelemetry: autoinstrumentation using a javaagent or manual instrumentation by modifying the code. But Quarkus offers a third and much better option: An extension for OpenTelemetry that automatically collects tracing data.</p>
+
+<p>This is actually very simple and is described in detail in the <a href="https://quarkus.io/guides/opentelemetry">Quarkus OpenTelemetry Guide</a>. I just want to point out the two changes that actually need to be made:: add the <code class="language-plaintext highlighter-rouge">quarkus-opentelemetry-exporter-otlp</code> extension to the <code class="language-plaintext highlighter-rouge">pom.xml</code> and configure it in <code class="language-plaintext highlighter-rouge">application.properties</code>.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>io.quarkus<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>quarkus-opentelemetry-exporter-otlp<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">quarkus.application.name</span><span class="p">=</span><span class="s">myservice</span>
+<span class="py">quarkus.opentelemetry.enabled</span><span class="p">=</span><span class="s">true</span>
+<span class="py">quarkus.opentelemetry.tracer.exporter.otlp.endpoint</span><span class="p">=</span><span class="s">http://localhost:4317</span>
+</code></pre></div></div>
+
+<p>As a result the application can push traces to a OpenTelemetry Collector running on <code class="language-plaintext highlighter-rouge">localhost:4317</code>. To forward the data to a local Jaeger instance, please follow the <a href="https://quarkus.io/guides/opentelemetry#run-the-application">Quarkus OpenTelemetry Guide</a>.</p>
+
+<h2 id="2-adjust-the-trace-id-generation">2. Adjust the Trace-ID generation</h2>
+
+<p>Every request that hits the microservice application gets a unique Trace-ID. By the specification of OpenTelemetry the Trace-ID is by default randomly generated, but it offers an API to customize the Trace-ID generation:</p>
+
+<blockquote>
+  <p>The SDK MUST by default randomly generate both the TraceId and the SpanId. <br />
+The SDK MUST provide a mechanism for customizing the way IDs are generated for both the TraceId and the SpanId. <br />
+<a href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#id-generators">Source</a></p>
+</blockquote>
+
+<p>Unfortunately, AWS X-Ray has a more specific format: It expects a version number and the unix timestamp in the beginning of the Trace-ID. If X-Ray receives a randomly generated Trace-ID it might be silently ignored because it considers the Trace-ID as invalid or outdated.</p>
+
+<p>To solve such issues, OpenTelemetry provides an interface to overwrite the Trace-ID generation. For this purpose, a class must be added to the application that references it.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>io.opentelemetry.contrib<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>opentelemetry-aws-xray<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.14.0<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Singleton</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AwsOpenTelemetryIdGeneratorProducer</span> <span class="o">{</span>
+
+  <span class="nd">@Produces</span>
+  <span class="nd">@Singleton</span>
+  <span class="kd">public</span> <span class="nc">IdGenerator</span> <span class="nf">idGenerator</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="nc">AwsXrayIdGenerator</span><span class="o">.</span><span class="na">getInstance</span><span class="o">();</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<h2 id="3-use-the-aws-context-propagation">3. Use the AWS Context Propagation</h2>
+
+<p>Whenever microservice A calls microservice B the same Trace-ID must be used to report the tracing information in order to link both requests into a single distributed trace. To achieve this requirement, microservice A needs to pass the Trace-ID as part of the request to microservice B. This feature is called “Context Propagation”.</p>
+
+<p>Some AWS services, such as the AWS API Gateway or the AWS Elastic Load Balancer, can be configured to add the X-Ray Trace-ID to each incoming request. Typically, these services are the entry point into the microservices landscape and thus the beginning of the trace context. It is important to use the X-Ray context propagation format to receive the trace context from AWS services like API Gateway or ELB and pass it to downstream services like DynamoDB.</p>
+
+<p>There are diffent HTTP header formats, but the result is the same. The <a href="https://www.w3.org/TR/trace-context/">W3C Trace Context</a> is specified by the W3C and is used by OpenTelemetry by default. Unfortunately, X-Ray uses a different, more specific format. However, OpenTelemetry provides an extension for the X-Ray format, so it can be easily adopted.</p>
+
+<p>Add the OpenTelemetry extension to the <code class="language-plaintext highlighter-rouge">pom.xml</code></p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>io.opentelemetry<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>opentelemetry-extension-aws<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div></div>
+
+<p>and enable the xray propagator in the <code class="language-plaintext highlighter-rouge">application.properties</code></p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">quarkus.opentelemetry.propagators</span><span class="p">=</span><span class="s">xray</span>
+</code></pre></div></div>
+
+<p>As a result the <code class="language-plaintext highlighter-rouge">traceparent</code> header is changed to <code class="language-plaintext highlighter-rouge">X-Amzn-Trace-Id</code>.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt;&gt; GET /42 HTTP/1.1
+&gt;&gt; Accept: text/plain
+&gt;&gt; traceparent: 00-fde5c586b403d130a7cb756ccb05fb02-a01a988d41694782-01
+&gt;&gt; Host: localhost:8080
+&gt;&gt; User-Agent: Apache-HttpClient/4.5.13 (Java/18.0.1)
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt;&gt; GET /42 HTTP/1.1
+&gt;&gt; Accept: text/plain
+&gt;&gt; X-Amzn-Trace-Id: Root=1-641c1bd3-d485eee618a90c8ef3bc3978;Parent=64f85711e0109ce6;Sampled=1
+&gt;&gt; Host: localhost:8080
+&gt;&gt; User-Agent: Apache-HttpClient/4.5.13 (Java/18.0.1)
+</code></pre></div></div>
+
+<h2 id="4-run-the-opentelemetry-collector">4. Run the OpenTelemetry Collector</h2>
+
+<p>A key conecpt of OpenTelemetry is the Collector. It is a single service that receives tracing data from an application, processes the data and exports them to the specific backend such as Jaeger or AWS X-Ray. The OpenTelemetry Collector can be deployed as a standalone service or as a sidecar container in Kubernetes and others.</p>
+
+<p>Support for Jaeger is included in the standard version of OpenTelemetry, but it does not come with support for AWS X-Ray. Fortunately, AWS steps in and provides a customization for OpenTelemetry called the <a href="https://aws-otel.github.io/">AWS Distro for OpenTelemetry</a> that provides AWS X-Ray support. It is quite easy to run the collector as a sidecar in ECS or EKS, AWS provides it as a Docker image along with <a href="https://aws-otel.github.io/docs/getting-started/collector">good documention</a> for various environments. For ECS it is even simpler, the AWS console provides a checkbox to enable tracing support with OpenTelemetry.</p>
+
+<p><img src="/assets/images/2022-06-21/use-trace-collection.png" alt="Use trace collection" /></p>
+
+<p>Afterwards, the microservice running in ECS can access the OpenTelemetry collector on <code class="language-plaintext highlighter-rouge">localhost:4317</code>. Therefore there is no need to change the oltp-endpoint in the <code class="language-plaintext highlighter-rouge">application.properties</code></p>
+
+<h1 id="observing-the-results-with-a-sample-application">Observing the results with a sample application</h1>
+
+<p>To show the results, I created an almost useful example microservice called <code class="language-plaintext highlighter-rouge">is-odd</code> that determines if a given number is odd. Calling the example application with <code class="language-plaintext highlighter-rouge">GET /42</code> returns <code class="language-plaintext highlighter-rouge">false</code>. A second microservice <code class="language-plaintext highlighter-rouge">is-even</code> uses <code class="language-plaintext highlighter-rouge">is-odd</code> to negate its result and indicate whether a given number is even. To complete the overall microservice architecture, both microservices are deployed on ECS and equipped with an API gateway that has X-Ray support enabled. Both applications can be found on <a href="https://github.com/ThomasPr/opentracing-microservices">Github</a></p>
+
+<p>The result is no surprise: both the service map and the segments timeline in CloudWatch show that the request travels from the client through the API gateway to the sample applications <code class="language-plaintext highlighter-rouge">is-even</code> and <code class="language-plaintext highlighter-rouge">is-odd</code> in AWS ECS. It can be observed that the API gateway causes the largest delay for the request shown in the screenshot, however, the overall response time of just 8 ms is pretty fast.</p>
+
+<p><img src="/assets/images/2022-06-21/service-map.png" alt="Service map" />
+<img src="/assets/images/2022-06-21/segments-timeline.png" alt="Service map" /></p>
+
+<p>In summary, the proposed solution offers two key benefits:</p>
+
+<ul>
+  <li>Traces cover the entire microservice landscape, including self-developed applications and AWS-hosted services.</li>
+  <li>There is no need to integrate a javaagent. The native executable mode of Quarkus is supported.</li>
+</ul>]]></content><author><name>Thomas Preißler</name></author><summary type="html"><![CDATA[Integrate OpenTelemetry into a Java Quarkus microservice to send distributed traces to AWS X-Ray. No javaagent is required and it supports the Quarkus native mode. This solution enables observation of the entire microservice infrastructure, including services hosted by AWS.]]></summary></entry><entry><title type="html">Download a file by an anchor-element only. No more Content-Disposition!</title><link href="https://thomas.preissler.me/blog/2022/05/04/download-a-file-by-an-anchor-element-only" rel="alternate" type="text/html" title="Download a file by an anchor-element only. No more Content-Disposition!" /><published>2022-05-04T06:00:00+00:00</published><updated>2022-05-04T06:00:00+00:00</updated><id>https://thomas.preissler.me/blog/2022/05/04/download-a-file-by-an-anchor-element-only</id><content type="html" xml:base="https://thomas.preissler.me/blog/2022/05/04/download-a-file-by-an-anchor-element-only"><![CDATA[<p>In the past I used the HTTP header <code class="language-plaintext highlighter-rouge">Content-Disposition</code> to instruct the browser to download a file. I ended up doing this because I knew of no other way for this.</p>
 
 <p>Until today.</p>
 
@@ -991,58 +1121,4 @@ The right half consists of only one distance with 6 length units.</p>
 
 <p>Thats it. The blog is up and running. Every time I push a change to my blog, the GitHub Action is triggered and the updated static HTML page is published.</p>
 
-<p>Comments are welcome on <a href="https://twitter.com/TheThomasPr/status/1343104333295058944">Twitter</a> or <a href="https://www.linkedin.com/posts/thomas-preissler_build-my-jekyll-blog-with-bare-github-actions-activity-6857657838328696832-A5b7">LinkedIn</a>.</p>]]></content><author><name>Thomas Preißler</name></author><summary type="html"><![CDATA[Use GitHub Actions without third-party marketplace Actions to build my Jekyll blog. Publish the generated content on GitHub Pages.]]></summary></entry><entry><title type="html">Make decisions about a blogging system</title><link href="https://thomas.preissler.me/blog/2020/12/20/make-decisions-about-a-blogging-system" rel="alternate" type="text/html" title="Make decisions about a blogging system" /><published>2020-12-20T21:43:50+00:00</published><updated>2020-12-20T21:43:50+00:00</updated><id>https://thomas.preissler.me/blog/2020/12/20/make-decisions-about-a-blogging-system</id><content type="html" xml:base="https://thomas.preissler.me/blog/2020/12/20/make-decisions-about-a-blogging-system"><![CDATA[<p>I’m a person who really thinks twice about the future development of his decisions, especially when it comes to a system that I probably use for years. It took me ages to set up a blog like this, but in the end it was just a matter of minutes. In this very first blog post I want to walk through the rationale that led me to the current setup.</p>
-
-<h2 id="my-requirements">My Requirements</h2>
-
-<ul>
-  <li>Having the content under version control (git)</li>
-  <li>No vendor lock-in</li>
-  <li>No burden for recurring maintence like security updates</li>
-  <li>Use my own domain</li>
-  <li>Fully customizable layout and content to fit my needs</li>
-  <li>No WYSIWYG-editor, the HTML code looks always a bit creepy</li>
-</ul>
-
-<h2 id="the-alternatives">The Alternatives</h2>
-
-<p>There are many services and software out there to get almost the same result. Basically they can be grouped into four categories:</p>
-
-<h3 id="software-as-a-service">Software as a Service</h3>
-
-<p>Providers who offer a fully-featured system hosted and managed by them. You only need to sign up for their service and can start writing your first post.</p>
-
-<p>The most popular blogging provider is workpress.com who provides a hosting instance of WordPress. Please be aware about the difference of the provider WordPress.com and the software WordPress. Other well-known providers are wix.com or jimdo.com, but there are many more out there.</p>
-
-<h3 id="software-installed-on-your-own-server">Software installed on your own server</h3>
-
-<p>Software to be installed and managed by your own on your own server. Mostly, you need a php-powered webspace with a database and upload the software to this webspace. After entering some configuration options you can start blogging. The setup is quite easy and many webspace providers offer a one-click installation where they automated the hassle of installing and configuring the software. However, it’s very uncommon to install software updates and offer migrations in a one-click fashion. WordPress is the the most popular software, but only one out of a huge list.</p>
-
-<h3 id="static-site-generators">Static site generators</h3>
-
-<p>Since I do not plan to offer any dynamic content like comments, contact forms or user login, the blog itself can be run by static pages only. A static site generator where I create the content locally, generate the web page and upload that to web server is a valid option for my requirements. The generated pages can be uploaded to AWS S3 or even simpler just to GitHub Pages. Static site generators are not that common, but some of the known ones are Jekyll, Hugo or Middleman.</p>
-
-<h3 id="develop-the-software-by-my-own">Develop the software by my own</h3>
-
-<p>This feels like re-inventing the wheel once again, but this will be the most flexible and most customizable solution. Since I’m a professional software developer, I have quite some experience to develop my own software.</p>
-
-<h2 id="my-decision">My Decision</h2>
-
-<p>It took ages from the idea to blog by myself until I finally was able to write this blog post you’re reading right now. Let me show you my opinion about the options:</p>
-
-<ul>
-  <li>Software as a Service: This seems to be the worst option, I’m hardly able to move my content, have to use a WYSIWYG editor and be unable to fully customize my blog. Therefore, I won’t go for that.</li>
-  <li>Software installed on my own server: Thats a much better option, at least I’m able to access the content in the database. But even if I can modify the software and therefore my blog therotically, I don’t have much experience with PHP which is used by many blog engines such as WordPress.</li>
-  <li>Static site generators: Seems to be a good option, I don’t have to deal with security updates, they’re usually simple enough for easy layout changes and depending on the hosting I’m able to use my own domain.</li>
-  <li>Developing my own software: A very flexible but very time-consuming option. Since I don’t want to focus on blogging itself, not on the blogging software, this option is not my preference. Additionally, I still have to deal with security updates, even worse I have to find and fix them by my own.</li>
-</ul>
-
-<p>In the end, I just decided to go for a static site generator: I really like the simplicity and the broad hosting options. Since I already spend so many time to for that decision, I just took the one that I alredy knew from the past: <strong>Jekyll</strong>. For the hosting part I’ll go for GitHub Pages who offers an incredible easy way to host static pages and even more actually generate the static pages based of the Jekyll content.</p>
-
-<p>Check out my public repository on GitHub to see final result:</p>
-<ul>
-  <li>The <a href="https://github.com/ThomasPr/ThomasPr.github.io/tree/master">master</a> branch contains the Jekyll content</li>
-  <li>The <a href="https://github.com/ThomasPr/ThomasPr.github.io/tree/gh-pages">gh-pages</a> branch contains the generated static pages which are visible in the blog</li>
-</ul>
-
-<p>Comments are welcome on <a href="https://twitter.com/TheThomasPr/status/1340778103929524234">Twitter</a> or <a href="https://www.linkedin.com/posts/thomas-preissler_make-decisions-about-a-blogging-system-activity-6857657519179931648-4RHN">LinkedIn</a>.</p>]]></content><author><name>Thomas Preißler</name></author><summary type="html"><![CDATA[It was a challenging task to decide which software I want to use for this blog.]]></summary></entry></feed>
+<p>Comments are welcome on <a href="https://twitter.com/TheThomasPr/status/1343104333295058944">Twitter</a> or <a href="https://www.linkedin.com/posts/thomas-preissler_build-my-jekyll-blog-with-bare-github-actions-activity-6857657838328696832-A5b7">LinkedIn</a>.</p>]]></content><author><name>Thomas Preißler</name></author><summary type="html"><![CDATA[Use GitHub Actions without third-party marketplace Actions to build my Jekyll blog. Publish the generated content on GitHub Pages.]]></summary></entry></feed>
