@@ -59,9 +59,9 @@ var store = [{
         "url": "/blog/2022/05/04/download-a-file-by-an-anchor-element-only",
         "teaser": null
       },{
-        "title": "OpenTelemetry with Quarkus to push distributed traces to AWS X-Ray.",
+        "title": "OpenTelemetry with Quarkus to push distributed traces to AWS X-Ray",
         "excerpt":"Distributed Tracing enables a DevOps team to observe user requests as they travel through multiple services and applications in a microservices landscape. It provides a centralized view of how user requests are performing across all involved services. Nowadays, a microservice architecture consists of many self-developed as well as hosted and...","categories": [],
         "tags": [],
-        "url": "/blog/2022/06/21/quarkus-with-opentelemetry",
+        "url": "/blog/2022/06/21/opentelemetry-with-quarkus-to-push-distributed-traces-to-aws-xray",
         "teaser": null
       }]
