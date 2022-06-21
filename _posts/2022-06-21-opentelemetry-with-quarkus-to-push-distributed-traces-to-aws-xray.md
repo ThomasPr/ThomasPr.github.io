@@ -1,5 +1,5 @@
 ---
-title:  "OpenTelemetry with Quarkus to push distributed traces to AWS X-Ray."
+title:  "OpenTelemetry with Quarkus to push distributed traces to AWS X-Ray"
 date:   2022-06-21 16:00:00 +0200
 excerpt: "Integrate OpenTelemetry into a Java Quarkus microservice to send distributed traces to AWS X-Ray. No javaagent is required and it supports the Quarkus native mode. This solution enables observation of the entire microservice infrastructure, including services hosted by AWS."
 header:
