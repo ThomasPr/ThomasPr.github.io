@@ -149,3 +149,6 @@ In summary, the proposed solution offers two key benefits:
 
   - Traces cover the entire microservice landscape, including self-developed applications and AWS-hosted services.
   - There is no need to integrate a javaagent. The native executable mode of Quarkus is supported.
+
+
+Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1539251158287515650) or [LinkedIn](https://www.linkedin.com/posts/thomas-preissler_opentelemetry-with-quarkus-to-push-distributed-activity-6945017185345970176-bHx9).
