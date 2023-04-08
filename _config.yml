@@ -92,9 +92,9 @@ author:
   bio      : "software developer,<br />addicted to KISS"
   location : "Freiburg, Germany"
   links:
-    - label: "NTT DATA"
+    - label: "Haufe Akademie"
       icon: "fas fa-fw fa-building"
-      url: "https://de.nttdata.com/"
+      url: "https://www.haufe-akademie.de/"
     - label: "Email"
       icon: "fas fa-fw fa-envelope"
       url: "mailto:thomas@preissler.me"

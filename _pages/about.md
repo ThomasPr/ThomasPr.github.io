@@ -14,7 +14,8 @@ My passion is to follow the **KISS** principle through the journey of a software
 
 ### Work Experience
 
-- **NTT DATA Germany**, Munich, Lead Developer, since 2016<br>Jakarta EE, Quarkus, Angular, OpenShift, AWS
+- **Haufe Akademie**, Freiburg, Software Engineer, since 2023<br>TypeScript, AWS
+- **NTT DATA Germany**, Munich, Lead Technical Consultant, 2016&#8239;-&#8239;2023<br>Jakarta EE, Quarkus, TypeScript, Angular, OpenShift, AWS
 - **Riser**, Vienna, CTO, 2015&#8239;-&#8239;2018<br>Ruby on Rails, PostGIS
 - **eightloops**, Munich, working student, 2011&#8239;-&#8239;2016<br>Ruby on Rails, Postfix, Chef
 - **Jato Consulting**, Munich, working student, 2009&#8239;-&#8239;2010<br>Java EE, Apache Struts, Apache Wicket
