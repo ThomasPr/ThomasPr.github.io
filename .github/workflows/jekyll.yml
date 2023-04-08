@@ -23,21 +23,10 @@ jobs:
           path: 'gh-pages'
 
       - name: setup ruby
-        uses: actions/setup-ruby@v1
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.7
-
-      - name: cache gems
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: ${{ runner.os }}-gems-
-
-      - name: bundle install
-        run: |
-          bundle install --path=vendor/bundle --jobs 4 --retry 3
-          bundle clean
+          bundler-cache: true
 
       - name: jekyll build
         run: JEKYLL_ENV=production bundle exec jekyll build --destination gh-pages
