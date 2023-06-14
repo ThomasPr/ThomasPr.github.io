@@ -1,4 +1,140 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://thomas.preissler.me/feed.xml" rel="self" type="application/atom+xml" /><link href="https://thomas.preissler.me/" rel="alternate" type="text/html" /><updated>2023-06-11T12:51:18+00:00</updated><id>https://thomas.preissler.me/feed.xml</id><title type="html">Thomas’ Blog</title><subtitle>My personal thoughts on technology and oddities.</subtitle><author><name>Thomas Preißler</name></author><entry><title type="html">OpenTelemetry with Quarkus to push distributed traces to AWS X-Ray</title><link href="https://thomas.preissler.me/blog/2022/06/21/opentelemetry-with-quarkus-to-push-distributed-traces-to-aws-xray" rel="alternate" type="text/html" title="OpenTelemetry with Quarkus to push distributed traces to AWS X-Ray" /><published>2022-06-21T14:00:00+00:00</published><updated>2022-06-21T14:00:00+00:00</updated><id>https://thomas.preissler.me/blog/2022/06/21/opentelemetry-with-quarkus-to-push-distributed-traces-to-aws-xray</id><content type="html" xml:base="https://thomas.preissler.me/blog/2022/06/21/opentelemetry-with-quarkus-to-push-distributed-traces-to-aws-xray"><![CDATA[<p>Distributed Tracing enables a DevOps team to observe user requests as they travel through multiple services and applications in a microservices landscape. It provides a centralized view of how user requests are performing across all involved services. Nowadays, a microservice architecture consists of many self-developed as well as hosted and preconfigured services such as API gateways, load balancers or databases. To get a deep insight into the overall microservice architecture, traces of self-developed microservices need to be combined with traces of hosted services. AWS X-Ray can be employed for this purpose, but it adds a vendor-specific javaagent to the application. Alternatively, OpenTelemetry can be used to get traces from self-developed applications and push them to AWS X-Ray. The result is similar, traces can be observed for the entire microservices landscape, but it avoids adding the AWS X-Ray javaagent to the self-developed application.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://thomas.preissler.me/feed.xml" rel="self" type="application/atom+xml" /><link href="https://thomas.preissler.me/" rel="alternate" type="text/html" /><updated>2023-06-14T20:18:32+00:00</updated><id>https://thomas.preissler.me/feed.xml</id><title type="html">Thomas’ Blog</title><subtitle>My personal thoughts on technology and oddities.</subtitle><author><name>Thomas Preißler</name></author><entry><title type="html">Leveraging the Power of JavaScript Generator Functions: Keep Database Batch Operations clean and maintainable</title><link href="https://thomas.preissler.me/blog/2023/06/14/javascript-generator-functions" rel="alternate" type="text/html" title="Leveraging the Power of JavaScript Generator Functions: Keep Database Batch Operations clean and maintainable" /><published>2023-06-14T20:00:00+00:00</published><updated>2023-06-14T20:00:00+00:00</updated><id>https://thomas.preissler.me/blog/2023/06/14/javascript-generator-functions</id><content type="html" xml:base="https://thomas.preissler.me/blog/2023/06/14/javascript-generator-functions"><![CDATA[<p><strong>In Node.js applications, querying a database in batches can be a common requirement when dealing with large datasets. In this blog post, we’ll explore how generator functions can streamline the process of querying a database in batches to keep the code clean and maintainable.</strong></p>
+
+<p>The blog post is divided into 4 parts:</p>
+
+<ol>
+  <li><a href="#1-integrate-opentelemetry-into-the-quarkus-application">Without Batch Operations</a></li>
+  <li><a href="#2-querying-in-batches-without-generator-functions">Querying in Batches without Generator Functions</a></li>
+  <li><a href="#3-querying-in-batches-with-generator-functions">Querying in Batches with Generator Functions</a></li>
+  <li><a href="#4-clean-code-extract-the-batch-logic-into-its-own-function">Clean Code: Extract the batch logic into its own function</a></li>
+</ol>
+
+<h2 id="1-without-batch-operations">1. Without Batch Operations</h2>
+
+<p>Suppose we want to send a notification to all our users, we would need to retrieve all users from the database using TypeORM, iterate over each individual user and send the actual notification. The code is clean and split up into the more general function <code class="language-plaintext highlighter-rouge">sendOfferToUsers()</code>, whereas the database query logic is encapsulated into <code class="language-plaintext highlighter-rouge">findAllConfirmedUsers()</code></p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">sendOfferToUsers</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">user</span> <span class="k">of</span> <span class="k">await</span> <span class="nx">findAllConfirmedUsers</span><span class="p">())</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">message</span> <span class="o">=</span> <span class="s2">`Special Offer just for </span><span class="p">${</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+    <span class="k">await</span> <span class="nx">notifyUser</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">email</span><span class="p">,</span> <span class="nx">message</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">findAllConfirmedUsers</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">await</span> <span class="nx">userRepository</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span>
+    <span class="na">where</span><span class="p">:</span> <span class="p">{</span> <span class="na">confirmed</span><span class="p">:</span> <span class="kc">true</span> <span class="p">}</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">notifyUser</span><span class="p">(</span><span class="nx">email</span><span class="p">:</span> <span class="kr">string</span><span class="p">,</span> <span class="nx">message</span><span class="p">:</span> <span class="kr">string</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// omitted for the brevity</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>While this approach works fine for smaller datasets, it becomes inefficient and memory-intensive when dealing with larger ones. To address this issue, we need to query the database in batches.</p>
+
+<h2 id="2-querying-in-batches-without-generator-functions">2. Querying in Batches without Generator Functions</h2>
+
+<p>To efficiently query large datasets from a database, it’s necessary to retrieve the data in subsets rather than all at once. This is achieved through batch operations, which involve querying the database multiple times and limiting the returned rows to a specific number while skipping the previously fetched rows.</p>
+
+<p>TypeORM allows us to set take and skip attributes for batch querying, but it requires explicit configuration. Here’s an example of implementing batch operations</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">sendOfferToUsers</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">batchSize</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">batchIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">users</span><span class="p">:</span> <span class="nx">User</span><span class="p">[];</span>
+
+  <span class="k">do</span> <span class="p">{</span>
+    <span class="nx">users</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">findAllConfirmedUsers</span><span class="p">(</span><span class="nx">batchSize</span><span class="p">,</span> <span class="nx">batchIndex</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">user</span> <span class="k">of</span> <span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">const</span> <span class="nx">message</span> <span class="o">=</span> <span class="s2">`Special Offer just for </span><span class="p">${</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+      <span class="k">await</span> <span class="nx">notifyUser</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">email</span><span class="p">,</span> <span class="nx">message</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="nx">batchIndex</span><span class="o">++</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">users</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="nx">batchSize</span><span class="p">);</span>
+
+<span class="p">}</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">findAllConfirmedUsers</span><span class="p">(</span><span class="nx">batchSize</span><span class="p">:</span> <span class="kr">number</span><span class="p">,</span> <span class="nx">batchIndex</span><span class="p">:</span> <span class="kr">number</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">await</span> <span class="nx">userRepository</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span>
+    <span class="na">where</span><span class="p">:</span> <span class="p">{</span> <span class="na">confirmed</span><span class="p">:</span> <span class="kc">true</span> <span class="p">},</span>
+    <span class="na">take</span><span class="p">:</span> <span class="nx">batchSize</span><span class="p">,</span>
+    <span class="na">skip</span><span class="p">:</span> <span class="nx">batchIndex</span> <span class="o">*</span> <span class="nx">batchSize</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Obviously, the code is less readable than the previous example due to littering the batch operation from the database-specific method <code class="language-plaintext highlighter-rouge">findAllConfirmedUsers()</code> into <code class="language-plaintext highlighter-rouge">sendOfferToUsers()</code>. But I want to keep all database-related code in the <code class="language-plaintext highlighter-rouge">findAllConfirmedUsers()</code> to seperate the different levels. To solve this issue, we need to employ a generator function.</p>
+
+<h2 id="3-querying-in-batches-with-generator-functions">3. Querying in Batches with Generator Functions</h2>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">sendOfferToUsers</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="k">await</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">user</span> <span class="k">of</span> <span class="nx">findAllConfirmedUsers</span><span class="p">())</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">message</span> <span class="o">=</span> <span class="s2">`Special Offer just for </span><span class="p">${</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+    <span class="k">await</span> <span class="nx">notifyUser</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">email</span><span class="p">,</span> <span class="nx">message</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">async</span> <span class="kd">function</span><span class="o">*</span> <span class="nx">findAllConfirmedUsers</span><span class="p">()</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">batchSize</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">batchIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">users</span><span class="p">:</span> <span class="nx">User</span><span class="p">[];</span>
+
+  <span class="k">do</span> <span class="p">{</span>
+    <span class="nx">users</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">userRepository</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span>
+      <span class="na">where</span><span class="p">:</span> <span class="p">{</span> <span class="na">confirmed</span><span class="p">:</span> <span class="kc">true</span> <span class="p">},</span>
+      <span class="na">take</span><span class="p">:</span> <span class="nx">batchSize</span><span class="p">,</span>
+      <span class="na">skip</span><span class="p">:</span> <span class="nx">batchIndex</span> <span class="o">*</span> <span class="nx">batchSize</span>
+    <span class="p">});</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">user</span> <span class="k">of</span> <span class="nx">users</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">yield</span> <span class="nx">user</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">batchIndex</span><span class="o">++</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">users</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="nx">batchSize</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>By using a generator function, the code becomes readable and maintainable again. The <code class="language-plaintext highlighter-rouge">sendOfferToUsers()</code> function remains clean and focuses on the core logic, while the batch query details are encapsulated in the <code class="language-plaintext highlighter-rouge">findAllConfirmedUsers()</code> generator function.</p>
+
+<p>The generator function is a special type of function that can be paused and resumed during execution, allowing for the generation of a sequence of values. <code class="language-plaintext highlighter-rouge">findAllConfirmedUsers()</code> retrieves users from the database in batches and yields one user at a time. The <code class="language-plaintext highlighter-rouge">for await...of</code> loop in the <code class="language-plaintext highlighter-rouge">sendOfferToUsers()</code> function then iterates over the generated values, providing a clean and readable way to process each user without loading the entire dataset into memory. The code becomes more efficient and memory-friendly when dealing with large datasets.</p>
+
+<h2 id="4-clean-code-extract-the-batch-logic-into-its-own-function">4. Clean Code: Extract the batch logic into its own function</h2>
+
+<p>To further improve the code I want to extract the batch logic into its own method to make it reusable. It should be used to fetch arbritary entities in batches without the need to copy the batch logic.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">sendOfferToUsers</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="k">await</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">user</span> <span class="k">of</span> <span class="nx">findAllConfirmedUsers</span><span class="p">())</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">message</span> <span class="o">=</span> <span class="s2">`Special Offer just for </span><span class="p">${</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+    <span class="k">await</span> <span class="nx">notifyUser</span><span class="p">(</span><span class="nx">user</span><span class="p">.</span><span class="nx">email</span><span class="p">,</span> <span class="nx">message</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">async</span> <span class="kd">function</span><span class="o">*</span> <span class="nx">findAllConfirmedUsers</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">yield</span><span class="o">*</span> <span class="nx">findInBatches</span><span class="p">(</span><span class="nx">userRepository</span><span class="p">,</span> <span class="p">{</span> <span class="na">where</span><span class="p">:</span> <span class="p">{</span> <span class="na">confirmed</span><span class="p">:</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">async</span> <span class="kd">function</span><span class="o">*</span> <span class="nx">findInBatches</span><span class="o">&lt;</span><span class="nx">T</span> <span class="kd">extends</span> <span class="nx">ObjectLiteral</span><span class="o">&gt;</span><span class="p">(</span><span class="nx">repository</span><span class="p">:</span> <span class="nx">Repository</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">findOptions</span><span class="p">:</span> <span class="nx">FindManyOptions</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;</span><span class="p">,</span> <span class="nx">batchSize</span><span class="p">:</span> <span class="kr">number</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">let</span> <span class="nx">batchIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">entities</span><span class="p">:</span> <span class="nx">T</span><span class="p">[];</span>
+  <span class="k">do</span> <span class="p">{</span>
+    <span class="nx">entities</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">repository</span><span class="p">.</span><span class="nx">find</span><span class="p">({</span>
+      <span class="na">take</span><span class="p">:</span> <span class="nx">batchSize</span><span class="p">,</span>
+      <span class="na">skip</span><span class="p">:</span> <span class="nx">batchIndex</span> <span class="o">*</span> <span class="nx">batchSize</span><span class="p">,</span>
+      <span class="p">...</span><span class="nx">findOptions</span>
+    <span class="p">});</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">const</span> <span class="nx">entity</span> <span class="k">of</span> <span class="nx">entities</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">yield</span> <span class="nx">entity</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">batchIndex</span><span class="o">++</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="nx">entities</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="nx">batchSize</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">yield*</code> keyword is used to delegate the iteration control from one generator function to another. In the <code class="language-plaintext highlighter-rouge">findAllConfirmedUsers()</code> function, yield* <code class="language-plaintext highlighter-rouge">findInBatches()</code> is used to delegate the iteration over the batched users to the <code class="language-plaintext highlighter-rouge">findInBatches()</code> generator function. This allows for a clean separation of concerns, where the <code class="language-plaintext highlighter-rouge">findAllConfirmedUsers()</code> function focuses on retrieving users from the database, while the <code class="language-plaintext highlighter-rouge">findInBatches()</code> function handles the batch querying logic.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In Node.js applications, querying a database in batches is essential for handling large datasets efficiently. By utilizing generator functions, we can simplify the code, improve readability, and maintainability. The extracted batch logic also promotes clean code organization and reusability. Generator functions are a powerful language feature that I just learned about a few weeks ago.</p>]]></content><author><name>Thomas Preißler</name></author><summary type="html"><![CDATA[In Node.js applications, querying a database in batches can be a common requirement when dealing with large datasets. Generator functions can streamline the process of querying a database in batches to keep the code clean and maintainable.]]></summary></entry><entry><title type="html">OpenTelemetry with Quarkus to push distributed traces to AWS X-Ray</title><link href="https://thomas.preissler.me/blog/2022/06/21/opentelemetry-with-quarkus-to-push-distributed-traces-to-aws-xray" rel="alternate" type="text/html" title="OpenTelemetry with Quarkus to push distributed traces to AWS X-Ray" /><published>2022-06-21T14:00:00+00:00</published><updated>2022-06-21T14:00:00+00:00</updated><id>https://thomas.preissler.me/blog/2022/06/21/opentelemetry-with-quarkus-to-push-distributed-traces-to-aws-xray</id><content type="html" xml:base="https://thomas.preissler.me/blog/2022/06/21/opentelemetry-with-quarkus-to-push-distributed-traces-to-aws-xray"><![CDATA[<p>Distributed Tracing enables a DevOps team to observe user requests as they travel through multiple services and applications in a microservices landscape. It provides a centralized view of how user requests are performing across all involved services. Nowadays, a microservice architecture consists of many self-developed as well as hosted and preconfigured services such as API gateways, load balancers or databases. To get a deep insight into the overall microservice architecture, traces of self-developed microservices need to be combined with traces of hosted services. AWS X-Ray can be employed for this purpose, but it adds a vendor-specific javaagent to the application. Alternatively, OpenTelemetry can be used to get traces from self-developed applications and push them to AWS X-Ray. The result is similar, traces can be observed for the entire microservices landscape, but it avoids adding the AWS X-Ray javaagent to the self-developed application.</p>
 
 <p>OpenTelemetry is the new shining star on the Observability horizon. It aims to standardize the three pillars of observability: Tracing, Logging, and Metrics. OpenTelemetry is a set of vendor-independent APIs and SDKs for collecting and exporting telemetry data. To obtain distributed traces of an application, only the general OpenTelemetry interface needs to be integrated without a vendor-specific implementation or library. The three major cloud providers, <a href="https://aws.amazon.com/otel">AWS</a>, <a href="https://docs.microsoft.com/azure/azure-monitor/app/opentelemetry-overview">Azure</a> and <a href="https://cloud.google.com/learn/what-is-opentelemetry">Google</a>, already provide an interface from OpenTelemetry to their hosted tracing solutions. I expect OpenTelemetry to be the only widely used observability API in the future. It already provides good support for tracing and metrics, but they are still working on the specification for logging.</p>
 
@@ -1000,127 +1136,4 @@ The right half consists of only one distance with 6 length units.</p>
 
 <p>The code is also available on this <a href="https://gist.github.com/ThomasPr/8e038d5ebca97261940bf1dd13d3417d">GitHub Gist</a>.</p>
 
-<p>Comments are welcome on <a href="https://www.linkedin.com/posts/thomas-preissler_build-a-cartesian-product-with-java-streams-activity-6857658482074669056-FiZH">LinkedIn</a>.</p>]]></content><author><name>Thomas Preißler</name></author><summary type="html"><![CDATA[Building a Cartesian Product or Permutation is challenging. I used Java Streams to implement a readable algorithm.]]></summary></entry><entry><title type="html">Build my Jekyll blog with bare GitHub Actions</title><link href="https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions" rel="alternate" type="text/html" title="Build my Jekyll blog with bare GitHub Actions" /><published>2020-12-26T09:55:03+00:00</published><updated>2020-12-26T09:55:03+00:00</updated><id>https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions</id><content type="html" xml:base="https://thomas.preissler.me/blog/2020/12/26/build-my-jekyll-blog-with-bare-github-actions"><![CDATA[<p>I use <a href="https://jekyllrb.com/">Jekyll</a> to create my blog. It allows me to focus on writing the content with markdown and afterwards to generate a static HTML page that can be published easily.</p>
-
-<p>Next to Jekyll there are three additional components, all provided by GitHub:</p>
-
-<ul>
-  <li>source control for the raw blog content</li>
-  <li>generating the static page with GitHub Actions</li>
-  <li>hosting the generated static page with GitHub Pages</li>
-</ul>
-
-<p>Of course, there are many other options if you don’t prefer GitHub. You could also distribute these components to different providers. However, I like the simplicity and completness of GitHub. Additionally, GitHub is free of charge for my purposes.</p>
-
-<p>You can check out the final results in <a href="https://github.com/ThomasPr/ThomasPr.github.io">my public repository</a>. No worries, we’ll walk through the necessary steps.</p>
-
-<h2 id="1-create-jekyll-page">1. Create Jekyll page</h2>
-
-<p>This is not a blog post about Jekyll, they provide a good documentation. Just have a look at the <a href="https://jekyllrb.com/docs/">Jekyll Quickstart</a> to get started with Jekyll.</p>
-
-<h2 id="2-push-jekyll-page">2. Push Jekyll page</h2>
-
-<p>Push the newly created Jekyll page to the <code class="language-plaintext highlighter-rouge">master</code> branch of a newly created GitHub repository.</p>
-
-<p>In this example we’ll use the <code class="language-plaintext highlighter-rouge">master</code> branch for the raw Jekyll page, it’s the branch where I commit and push all the changes I make. In contrast to that, the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch will contain the automatically generated static HTML page where only the GitHub Action will push into.</p>
-
-<h2 id="3-add-the-github-action">3. Add the GitHub Action</h2>
-
-<p>A GitHub Action is a list of commands that will be executed after an event occurs, such as a new commit. It needs to be defined as a yaml file inside the <code class="language-plaintext highlighter-rouge">.github/workflows</code> folder of the repository. In our case, the GitHub Action is the important piece that is responsible for generating the static page out of the Jekyll source.</p>
-
-<p>Additionally, I don’t want to rely on any third-party marketplace Actions. They might be orphaned after some time or contain unwanted side-effects. So, I’ll just use the Actions and commands provided by GitHub itself.</p>
-
-<p>In contrast to automate the workflow by utilizing a GitHub Action, you could manually run <code class="language-plaintext highlighter-rouge">jekyll build</code> on your local machine and upload the <code class="language-plaintext highlighter-rouge">_site</code> directory to a server every time you make changes to your blog. Basically, the GitHub Action will do the same, but it will take the burden for this boring recurring task.</p>
-
-<p>You can see my complete GitHub Action <a href="https://github.com/ThomasPr/ThomasPr.github.io/blob/master/.github/workflows/jekyll.yml">here</a>.</p>
-
-<p>To be clear, the following steps are necessary:</p>
-
-<ol>
-  <li>Checkout the <code class="language-plaintext highlighter-rouge">master</code> branch</li>
-  <li>Install Ruby and the dependencies from the <code class="language-plaintext highlighter-rouge">Gemfile</code></li>
-  <li>Run <code class="language-plaintext highlighter-rouge">jekyll build</code></li>
-  <li>Push the generated HTML files to the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch</li>
-</ol>
-
-<p>Let me walk you through the important steps:</p>
-
-<h3 id="checkout">Checkout</h3>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">checkout master</span>
-  <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v2</span>
-
-<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">checkout gh-pages</span>
-  <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v2</span>
-  <span class="na">with</span><span class="pi">:</span>
-    <span class="na">ref</span><span class="pi">:</span> <span class="s1">'</span><span class="s">gh-pages'</span>
-    <span class="na">path</span><span class="pi">:</span> <span class="s1">'</span><span class="s">gh-pages'</span>
-</code></pre></div></div>
-
-<p>Both branches, <code class="language-plaintext highlighter-rouge">master</code> and <code class="language-plaintext highlighter-rouge">gh-pages</code>, will be checked out so that the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch resides in the subfolder <code class="language-plaintext highlighter-rouge">gh-pages</code>. Later on, Jekyll will write its output into this <code class="language-plaintext highlighter-rouge">gh-pages</code> folder.</p>
-
-<h3 id="install-ruby-and-dependencies">Install Ruby and dependencies</h3>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">setup ruby</span>
-  <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/setup-ruby@v1</span>
-  <span class="na">with</span><span class="pi">:</span>
-    <span class="na">ruby-version</span><span class="pi">:</span> <span class="m">2.7</span>
-
-<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cache gems</span>
-  <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/cache@v2</span>
-  <span class="na">with</span><span class="pi">:</span>
-    <span class="na">path</span><span class="pi">:</span> <span class="s">vendor/bundle</span>
-    <span class="na">key</span><span class="pi">:</span> <span class="s">${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}</span>
-    <span class="na">restore-keys</span><span class="pi">:</span> <span class="s">${{ runner.os }}-gems-</span>
-
-<span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">bundle install</span>
-  <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
-    <span class="s">bundle install --path=vendor/bundle --jobs 4 --retry 3</span>
-    <span class="s">bundle clean</span>
-</code></pre></div></div>
-
-<p>The three steps should be quite self-explaining. <code class="language-plaintext highlighter-rouge">setup ruby</code> takes care that ruby will be available for future steps and <code class="language-plaintext highlighter-rouge">bundle install</code> will install all gems as defined in the <code class="language-plaintext highlighter-rouge">Gemfile.lock</code>.</p>
-
-<p>The caching might not be obvious: It takes about three minutes to install all dependencies from scratch. But what if we could save this time by re-using the installed gems from a previous run? That’s exaclty what the <code class="language-plaintext highlighter-rouge">cache gems</code> step does. After each run of the GitHub Action it takes the folder <code class="language-plaintext highlighter-rouge">vendor/bundle</code>, puts that into a zip-archive and restores it before the next run. We just need to make sure that <code class="language-plaintext highlighter-rouge">bundle install</code> also uses the folder <code class="language-plaintext highlighter-rouge">vendor/bundle</code> for storing the gems. This will bring the build time down from over three minutes to less than thirty seconds.</p>
-
-<h3 id="build-the-static-page">Build the static page</h3>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">jekyll build</span>
-  <span class="na">run</span><span class="pi">:</span> <span class="s">JEKYLL_ENV=production bundle exec jekyll build --destination gh-pages</span>
-</code></pre></div></div>
-
-<p>Thats the main step in our GitHub Action, it actually takes Jekyll to generate the static HTML page. Please note that we specify the <code class="language-plaintext highlighter-rouge">gh-pages</code> folder as the destination for the <code class="language-plaintext highlighter-rouge">jekyll build</code> step. Remember, that we checked out the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch from our repository into this <code class="language-plaintext highlighter-rouge">gh-pages</code> folder.</p>
-
-<h3 id="push-the-generated-static-page">Push the generated static page</h3>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">push gh-pages</span>
-  <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
-    <span class="s">cd gh-pages &amp;&amp; \</span>
-    <span class="s">git config user.name "${GITHUB_ACTOR}" &amp;&amp; \</span>
-    <span class="s">git config user.email "${GITHUB_ACTOR}@users.noreply.github.com" &amp;&amp; \</span>
-    <span class="s">git add . &amp;&amp; \</span>
-    <span class="s">git commit -m "jekyll build from Action ${GITHUB_SHA}" &amp;&amp; \</span>
-    <span class="s">git push</span>
-</code></pre></div></div>
-
-<p>We’re switching into the folder <code class="language-plaintext highlighter-rouge">gh-pages</code> which has been created based on the branch <code class="language-plaintext highlighter-rouge">gh-pages</code> and which contains the latest changes to our static page from the last <code class="language-plaintext highlighter-rouge">jekyll build</code>. This step just commits and pushes any changes in this folder to the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch to get the static page that we can publish on the web. Actually, this step creates the HTML pages shown to a blog visitor.</p>
-
-<h3 id="see-the-github-action-in-action">See the GitHub Action in action</h3>
-
-<p>Once you committed and pushed this workflow-file into the master branch the GitHub Action should be executed. To verify that, click on the Action tab of your Repository and see your newly created Action. The first run can take a couple of minutes.</p>
-
-<p><img src="/assets/images/2020-12-26/github-action.png" alt="GitHub Action" /></p>
-
-<h2 id="4-enable-github-pages">4. Enable GitHub Pages</h2>
-
-<p>The last task is to enable the hosting of the generated static page content. Just make sure that the GitHub Action has been completed successfully before you continue.</p>
-
-<p>To enable GitHub Pages for your repository open the Settings tab and scroll down a little bit. You should see a section named “GitHub Pages”.</p>
-
-<p><img src="/assets/images/2020-12-26/github-pages.png" alt="GitHub Pages" /></p>
-
-<p>The only required setting is to change the Source to the <code class="language-plaintext highlighter-rouge">gh-pages</code> branch. But I strongly recommend to also enable the “Enforce HTTPS” setting.</p>
-
-<p>Thats it. The blog is up and running. Every time I push a change to my blog, the GitHub Action is triggered and the updated static HTML page is published.</p>
-
-<p>Comments are welcome on <a href="https://twitter.com/TheThomasPr/status/1343104333295058944">Twitter</a> or <a href="https://www.linkedin.com/posts/thomas-preissler_build-my-jekyll-blog-with-bare-github-actions-activity-6857657838328696832-A5b7">LinkedIn</a>.</p>]]></content><author><name>Thomas Preißler</name></author><summary type="html"><![CDATA[Use GitHub Actions without third-party marketplace Actions to build my Jekyll blog. Publish the generated content on GitHub Pages.]]></summary></entry></feed>
+<p>Comments are welcome on <a href="https://www.linkedin.com/posts/thomas-preissler_build-a-cartesian-product-with-java-streams-activity-6857658482074669056-FiZH">LinkedIn</a>.</p>]]></content><author><name>Thomas Preißler</name></author><summary type="html"><![CDATA[Building a Cartesian Product or Permutation is challenging. I used Java Streams to implement a readable algorithm.]]></summary></entry></feed>

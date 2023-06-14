@@ -64,4 +64,10 @@ var store = [{
         "tags": [],
         "url": "/blog/2022/06/21/opentelemetry-with-quarkus-to-push-distributed-traces-to-aws-xray",
         "teaser": null
+      },{
+        "title": "Leveraging the Power of JavaScript Generator Functions: Keep Database Batch Operations clean and maintainable",
+        "excerpt":"In Node.js applications, querying a database in batches can be a common requirement when dealing with large datasets. In this blog post, we’ll explore how generator functions can streamline the process of querying a database in batches to keep the code clean and maintainable. The blog post is divided into...","categories": [],
+        "tags": [],
+        "url": "/blog/2023/06/14/javascript-generator-functions",
+        "teaser": null
       }]
