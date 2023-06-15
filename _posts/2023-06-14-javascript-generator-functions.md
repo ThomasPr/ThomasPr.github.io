@@ -2,6 +2,8 @@
 title:  "Leveraging the Power of JavaScript Generator Functions: Keep Database Batch Operations clean and maintainable"
 date:   2023-06-14 22:00:00 +0200
 excerpt: "In Node.js applications, querying a database in batches can be a common requirement when dealing with large datasets. Generator functions can streamline the implementation to keep the code clean and maintainable."
+header:
+  og_image: /assets/images/2023-06-14/javascript-generator-functions.png
 ---
 
 
