@@ -160,3 +160,6 @@ The `yield*` keyword is used to pass on the iteration control from one generator
 ## Conclusion
 
 In Node.js applications, querying a database in batches is essential for handling large datasets efficiently. By utilizing generator functions, we can simplify the code, improve readability, and maintainability. The extracted batch logic also promotes clean code organization and reusability. Generator functions are a powerful language feature that I just learned about a few weeks ago.
+
+
+Comments are welcome on [Twitter](https://twitter.com/TheThomasPr/status/1669431803973627904) or [LinkedIn](https://www.linkedin.com/posts/thomas-preissler_leveraging-the-power-of-javascript-generator-activity-7075192818121486336-GCnS).
