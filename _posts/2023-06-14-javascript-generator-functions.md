@@ -1,21 +1,21 @@
 ---
 title:  "Leveraging the Power of JavaScript Generator Functions: Keep Database Batch Operations clean and maintainable"
 date:   2023-06-14 22:00:00 +0200
-excerpt: "In Node.js applications, querying a database in batches can be a common requirement when dealing with large datasets. Generator functions can streamline the process of querying a database in batches to keep the code clean and maintainable."
+excerpt: "In Node.js applications, querying a database in batches can be a common requirement when dealing with large datasets. Generator functions can streamline the implementation to keep the code clean and maintainable."
 ---
 
 
-**In Node.js applications, querying a database in batches can be a common requirement when dealing with large datasets. In this blog post, we'll explore how generator functions can streamline the process of querying a database in batches to keep the code clean and maintainable.**
+**In Node.js applications, querying a database in batches can be a common requirement when dealing with large datasets. In this blog post, we'll explore how generator functions can streamline the implementation to keep the code clean and maintainable.**
 
-The blog post is divided into 4 parts:
+The blog post is divided into 4 steps:
 
-1. [Without Batch Operations](#1-integrate-opentelemetry-into-the-quarkus-application)
-1. [Querying in Batches without Generator Functions](#2-querying-in-batches-without-generator-functions)
-1. [Querying in Batches with Generator Functions](#3-querying-in-batches-with-generator-functions)
+1. [Simple Querying Without Batch Operations](#1-simple-querying-without-batch-operations)
+1. [Implementing Batch Queries](#2-implementing-batch-queries)
+1. [ Using Generator Functions for Batch Queries](#3-using-generator-functions-for-batch-queries)
 1. [Clean Code: Extract the batch logic into its own function](#4-clean-code-extract-the-batch-logic-into-its-own-function)
 
 
-## 1. Without Batch Operations
+## 1. Simple Querying Without Batch Operations
 
 Suppose we want to send a notification to all our users, we would need to retrieve all users from the database using TypeORM, iterate over each individual user and send the actual notification. The code is clean and split up into the more general function `sendOfferToUsers()`, whereas the database query logic is encapsulated into `findAllConfirmedUsers()`
 
@@ -43,12 +43,11 @@ While this approach works fine for smaller datasets, it becomes inefficient and 
 
 
 
-## 2. Querying in Batches without Generator Functions
+## 2. Implementing Batch Queries
 
 To efficiently query large datasets from a database, it's necessary to retrieve the data in subsets rather than all at once. This is achieved through batch operations, which involve querying the database multiple times and limiting the returned rows to a specific number while skipping the previously fetched rows.
 
-TypeORM allows us to set take and skip attributes for batch querying, but it requires explicit configuration. Here's an example of implementing batch operations
-
+TypeORM allows us to set `take` and `skip` attributes for batch querying, but it requires explicit configuration. Here's an example of implementing batch operations:
 
 
 ```typescript
@@ -77,11 +76,14 @@ async function findAllConfirmedUsers(batchSize: number, batchIndex: number) {
 }
 ```
 
-Obviously, the code is less readable than the previous example due to littering the batch operation from the database-specific method `findAllConfirmedUsers()` into `sendOfferToUsers()`. But I want to keep all database-related code in the `findAllConfirmedUsers()` to seperate the different levels. To solve this issue, we need to employ a generator function.
+Obviously, the code is less readable than the previous example due to littering the batch operation from the database-specific method `findAllConfirmedUsers()` into `sendOfferToUsers()`. However, I want to enforce a stricter separation of concerns and keep all database-related code in `findAllConfirmedUsers()`.
+
+To address this requirement, we can employ a generator function.
 
 
-## 3. Querying in Batches with Generator Functions
+## 3. Using Generator Functions for Batch Queries
 
+Let's begin by examining the refactored code, where we consolidate all database-related logic into `findAllConfirmedUsers()` and transform it into a generator function.
 
 ```typescript
 async function sendOfferToUsers() {
@@ -110,16 +112,14 @@ async function* findAllConfirmedUsers() {
 }
 ```
 
-By using a generator function, the code becomes readable and maintainable again. The `sendOfferToUsers()` function remains clean and focuses on the core logic, while the batch query details are encapsulated in the `findAllConfirmedUsers()` generator function.
+The signature of `findAllConfirmedUsers()` has changed from `function` to `function*` (a star at the end) and includes the `yield` keyword in the function body. Beside from these syntactical changes, the function itself works much different. It's a special type of function that can be paused and resumed during execution, allowing for the generation of a sequence of values. `findAllConfirmedUsers()` retrieves users from the database in batches and yields one user at a time. The `for await...of` loop in the `sendOfferToUsers()` function then iterates over the generated values, providing a clean and readable way to process each user without loading the entire dataset into memory. The code becomes more efficient and memory-friendly when dealing with large datasets.
 
-The generator function is a special type of function that can be paused and resumed during execution, allowing for the generation of a sequence of values. `findAllConfirmedUsers()` retrieves users from the database in batches and yields one user at a time. The `for await...of` loop in the `sendOfferToUsers()` function then iterates over the generated values, providing a clean and readable way to process each user without loading the entire dataset into memory. The code becomes more efficient and memory-friendly when dealing with large datasets.
-
+Using a generator function makes the code more readable and maintainable. The `sendOfferToUsers()` function remains focused on its main purpose, while the details of batch querying are handled by the `findAllConfirmedUsers()` generator function.
 
 
 ## 4. Clean Code: Extract the batch logic into its own function
 
-
-To further improve the code I want to extract the batch logic into its own method to make it reusable. It should be used to fetch arbritary entities in batches without the need to copy the batch logic.
+To enhance the code further, we can extract the batch logic into its own function to make it reusable. This function can be used to retrieve arbitrary entities in batches, eliminating the need to duplicate the batch logic when fetching different types of entities.
 
 ```typescript
 async function sendOfferToUsers() {
@@ -130,12 +130,14 @@ async function sendOfferToUsers() {
 }
 
 async function* findAllConfirmedUsers() {
-  yield* findInBatches(userRepository, { where: { confirmed: true } }, 1000);
+  yield* findInBatches(userRepository, { where: { confirmed: true } });
 }
 
-async function* findInBatches<T extends ObjectLiteral>(repository: Repository<T>, findOptions: FindManyOptions<T>, batchSize: number = 1000) {
+async function* findInBatches<T extends ObjectLiteral>(repository: Repository<T>, findOptions: FindManyOptions<T>) {
+  const batchSize = 1000;
   let batchIndex = 0;
   let entities: T[];
+
   do {
     entities = await repository.find({
       take: batchSize,
@@ -150,7 +152,8 @@ async function* findInBatches<T extends ObjectLiteral>(repository: Repository<T>
 }
 ```
 
-The `yield*` keyword is used to delegate the iteration control from one generator function to another. In the `findAllConfirmedUsers()` function, yield* `findInBatches()` is used to delegate the iteration over the batched users to the `findInBatches()` generator function. This allows for a clean separation of concerns, where the `findAllConfirmedUsers()` function focuses on retrieving users from the database, while the `findInBatches()` function handles the batch querying logic.
+The `yield*` keyword is used to pass on the iteration control from one generator function to another. In the `findAllConfirmedUsers()` function, `yield*` is employed to transfer the iteration of the batched users to the `findInBatches()` generator function. This helps to maintain a clear separation of concerns: the `findAllConfirmedUsers()` function concentrates on fetching users from the database, while the `findInBatches()` function handles the logic for querying in batches.
+
 
 ## Conclusion
 
