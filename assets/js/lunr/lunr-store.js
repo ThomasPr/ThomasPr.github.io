@@ -66,7 +66,7 @@ var store = [{
         "teaser": null
       },{
         "title": "Leveraging the Power of JavaScript Generator Functions: Keep Database Batch Operations clean and maintainable",
-        "excerpt":"In Node.js applications, querying a database in batches can be a common requirement when dealing with large datasets. In this blog post, we’ll explore how generator functions can streamline the process of querying a database in batches to keep the code clean and maintainable. The blog post is divided into...","categories": [],
+        "excerpt":"In Node.js applications, querying a database in batches can be a common requirement when dealing with large datasets. In this blog post, we’ll explore how generator functions can streamline the implementation to keep the code clean and maintainable. The blog post is divided into 4 steps: Simple Querying Without Batch...","categories": [],
         "tags": [],
         "url": "/blog/2023/06/14/javascript-generator-functions",
         "teaser": null
